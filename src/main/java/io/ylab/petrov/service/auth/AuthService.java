@@ -1,7 +1,7 @@
-package io.ylab.petrov.io.service;
+package io.ylab.petrov.service.auth;
 
-import io.ylab.petrov.io.dto.AuthReqDto;
-import io.ylab.petrov.io.model.user.User;
+import io.ylab.petrov.dto.AuthReqDto;
+import io.ylab.petrov.model.user.User;
 
 public interface AuthService {
     boolean userRegistration(User user);

@@ -1,4 +1,4 @@
-package io.ylab.petrov.io.dto;
+package io.ylab.petrov.dto;
 
 import lombok.Builder;
 
