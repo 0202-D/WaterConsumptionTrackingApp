@@ -24,7 +24,6 @@ public class Main {
         AuthController authController = new AuthController();
         MonitoringController monitoringController = new MonitoringController();
         UserRepository userRepository = new InMemoryUserRepositoryImpl();
-     //   User currentUser = new User(1l, "Ivan", "123", Role.ADMIN);
         Scanner scanner = new Scanner(System.in);
         while (true) {
             User currentUser;
