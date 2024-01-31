@@ -17,7 +17,7 @@ public class Meter {
     /**
      * Уникальный идентификатор счетчика
      */
-    private long id;
+    private Long id;
     /**
      * Тип счетчика
      */

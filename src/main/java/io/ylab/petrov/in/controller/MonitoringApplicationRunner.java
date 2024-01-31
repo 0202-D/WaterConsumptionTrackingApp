@@ -1,10 +1,8 @@
-package io.ylab.petrov;
+package io.ylab.petrov.in.controller;
 
 import io.ylab.petrov.dao.user.InMemoryUserRepositoryImpl;
 import io.ylab.petrov.dao.user.UserRepository;
 import io.ylab.petrov.dto.ReadingInMonthRq;
-import io.ylab.petrov.in.controller.AuthController;
-import io.ylab.petrov.in.controller.MonitoringController;
 import io.ylab.petrov.dto.AddReadingRqDto;
 import io.ylab.petrov.dto.AuthReqDto;
 import io.ylab.petrov.dto.ReadingRqDto;
@@ -17,7 +15,7 @@ import java.time.Month;
 import java.util.Optional;
 import java.util.Scanner;
 
-public class Main {
+public class MonitoringApplicationRunner {
     public static void main(String[] args) {
         String input;
         String[] nameAndPassword;

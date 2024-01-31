@@ -12,12 +12,14 @@ import io.ylab.petrov.service.audit.AuditServiceImpl;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class AuthServiceImpl implements AuthService {
-    private static AtomicInteger userId = new AtomicInteger(2);
-    private final InMemoryUserRepositoryImpl inMemoryUserRepositoryImpl = new InMemoryUserRepositoryImpl();
+    private static AtomicLong userId = new AtomicLong(2);
     private final AuditService auditService = new AuditServiceImpl();
     private final UserRepository userRepository = new InMemoryUserRepositoryImpl();
+
+    private final InMemoryUserRepositoryImpl inMemoryUserRepository = new InMemoryUserRepositoryImpl();
 
     @Override
     public boolean userRegistration(User user) {
@@ -27,14 +29,14 @@ public class AuthServiceImpl implements AuthService {
             return false;
         }
         user.setId(userId.incrementAndGet());
-        inMemoryUserRepositoryImpl.addUser(user);
+        userRepository.addUser(user);
         auditService.addAction(new Action(user, Activity.REGISTERED, LocalDateTime.now()));
         return true;
     }
 
     @Override
     public boolean authenticateUser(AuthReqDto user) {
-        Optional<User> searchUser = inMemoryUserRepositoryImpl.getUsers().stream()
+        Optional<User> searchUser = inMemoryUserRepository.getUsers().stream()
                 .filter(el -> el.getUserName().equals(user.userName())).findFirst();
         if (searchUser.isEmpty()) {
             System.out.println("Пользователя с таким именем не существует");

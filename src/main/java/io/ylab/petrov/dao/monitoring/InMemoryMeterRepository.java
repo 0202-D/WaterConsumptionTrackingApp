@@ -36,4 +36,9 @@ public class InMemoryMeterRepository implements MeterRepository {
         meters.add(coldMeter);
         meters.add(heatingMeter);
     }
+
+    public void save(Meter meter) {
+    }
+
+    ;
 }

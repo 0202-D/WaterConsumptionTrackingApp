@@ -23,9 +23,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class MonitoringServiceImpl implements MonitoringService {
-    private static AtomicInteger id = new AtomicInteger(0);
+    private static AtomicLong id = new AtomicLong(0);
     private final UserRepository userRepository = new InMemoryUserRepositoryImpl();
     private final ReadingRepository readingRepository = new InMemoryReadingRepositoryImpl();
     private final MeterRepository meterRepository = new InMemoryMeterRepository();

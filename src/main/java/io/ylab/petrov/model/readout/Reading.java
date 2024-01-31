@@ -26,7 +26,7 @@ public class Reading {
     /**
      * Уникальный идентификатор счетчика
      */
-    private long id;
+    private Long id;
     /**
      * Пользователь
      */

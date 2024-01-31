@@ -16,7 +16,7 @@ public class User {
     /**
      * Уникальный идентификатор
      */
-    private long id;
+    private Long id;
     /**
      * Имя пользователя
      */
