@@ -41,7 +41,8 @@ public class JdbcActionRepository implements ActionRepository {
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, userName);
             try (ResultSet resultSet = statement.executeQuery()) {
-                var user = userRepository.getUserById(resultSet.getLong("user_id"));
+                var user = userRepository.getUserById(resultSet.getLong("user_id"))
+                        .orElseThrow(()->new RuntimeException("Пльзователя с таким id не существует"));
                 while (resultSet.next()) {
                     Action action = Action.builder()
                             .user(user)

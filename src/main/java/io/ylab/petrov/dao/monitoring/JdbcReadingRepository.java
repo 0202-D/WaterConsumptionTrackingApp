@@ -79,7 +79,8 @@ public class JdbcReadingRepository implements ReadingRepository {
                     reading.setId(resultSet.getLong("id"));
                     long userId = resultSet.getLong("user_id");
                     long meterId = resultSet.getLong("meter_id");
-                    var user = userRepository.getUserById(userId);
+                    var user = userRepository.getUserById(userId)
+                            .orElseThrow(()->new RuntimeException("Пользователя с таким id е существует"));
                     var meter = meterRepository.getMeterById(meterId);
                     reading.setMeter(meter);
                     reading.setUser(user);
@@ -105,7 +106,8 @@ public class JdbcReadingRepository implements ReadingRepository {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     Reading reading = new Reading();
-                    var user = userRepository.getUserById(resultSet.getLong("user_id"));
+                    var user = userRepository.getUserById(resultSet.getLong("user_id"))
+                            .orElseThrow(()->new RuntimeException("Пользователя с таким Id не существует"));
                     var meter = meterRepository.getMeterById(resultSet.getLong("meter_id"));
                     reading.setMeter(meter);
                     reading.setUser(user);
@@ -131,7 +133,6 @@ public class JdbcReadingRepository implements ReadingRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
 
 

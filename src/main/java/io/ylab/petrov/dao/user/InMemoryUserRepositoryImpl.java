@@ -40,7 +40,7 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
             System.out.println("Пользователя с таким id не существует");
             return null;
         }
-        return user.get();
+        return user;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
         Optional<User> user = users.stream().filter(el -> el.getUserName().equals(userName)).findFirst();
         if (user.isEmpty()) {
             System.out.println("Пользователя с таким userName не существует");
-            return null;
+            return Optional.empty();
         }
         return user;
     }

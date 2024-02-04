@@ -1,8 +1,5 @@
 package io.ylab.petrov.in.controller;
 
-import io.ylab.petrov.dao.user.InMemoryUserRepositoryImpl;
-import io.ylab.petrov.dao.user.JdbcUserRepository;
-import io.ylab.petrov.dao.user.UserRepository;
 import io.ylab.petrov.dto.ReadingInMonthRq;
 import io.ylab.petrov.dto.AddReadingRqDto;
 import io.ylab.petrov.dto.AuthReqDto;
