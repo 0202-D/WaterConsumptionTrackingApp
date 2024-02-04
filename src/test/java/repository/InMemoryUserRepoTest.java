@@ -39,10 +39,10 @@ public class InMemoryUserRepoTest {
 
     @Test
     @DisplayName("Тест получения юзера по имени")
-    public void testПetUserByUserName() {
+    public void testGetUserByUserName() {
         InMemoryUserRepositoryImpl userRepository = new InMemoryUserRepositoryImpl();
 
-        User user = userRepository.getUserByUserName("admin");
+        User user = userRepository.getUserByUserName("admin").get();
 
         assertNotNull(user);
         assertEquals("admin", user.getUserName());

@@ -44,12 +44,12 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User getUserByUserName(String userName) {
+    public Optional<User> getUserByUserName(String userName) {
         Optional<User> user = users.stream().filter(el -> el.getUserName().equals(userName)).findFirst();
         if (user.isEmpty()) {
             System.out.println("Пользователя с таким userName не существует");
             return null;
         }
-        return user.get();
+        return user;
     }
 }

@@ -39,6 +39,4 @@ public class InMemoryMeterRepository implements MeterRepository {
 
     public void save(Meter meter) {
     }
-
-    ;
 }

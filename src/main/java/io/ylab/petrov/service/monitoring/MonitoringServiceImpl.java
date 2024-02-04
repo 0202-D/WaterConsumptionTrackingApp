@@ -1,57 +1,64 @@
 package io.ylab.petrov.service.monitoring;
 
 
-import io.ylab.petrov.dao.monitoring.InMemoryMeterRepository;
-import io.ylab.petrov.dao.monitoring.MeterRepository;
-import io.ylab.petrov.dao.monitoring.ReadingRepository;
-import io.ylab.petrov.dao.monitoring.InMemoryReadingRepositoryImpl;
+import io.ylab.petrov.dao.audit.ActionRepository;
+import io.ylab.petrov.dao.audit.JdbcActionRepository;
+import io.ylab.petrov.dao.monitoring.*;
+import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
-import io.ylab.petrov.dao.user.InMemoryUserRepositoryImpl;
 import io.ylab.petrov.dto.AddReadingRqDto;
 import io.ylab.petrov.dto.ReadingInMonthRq;
 import io.ylab.petrov.dto.ReadingRqDto;
+import io.ylab.petrov.dto.ReadingRs;
 import io.ylab.petrov.model.audit.Action;
 import io.ylab.petrov.model.audit.Activity;
 import io.ylab.petrov.model.readout.Meter;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.model.user.User;
-import io.ylab.petrov.service.audit.AuditService;
-import io.ylab.petrov.service.audit.AuditServiceImpl;
+ import io.ylab.petrov.utils.DataBaseConnector;
 
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class MonitoringServiceImpl implements MonitoringService {
-    private static AtomicLong id = new AtomicLong(0);
-    private final UserRepository userRepository = new InMemoryUserRepositoryImpl();
-    private final ReadingRepository readingRepository = new InMemoryReadingRepositoryImpl();
-    private final MeterRepository meterRepository = new InMemoryMeterRepository();
-    private final AuditService auditService = new AuditServiceImpl();
+    // Connection нужно открывать в try with resources , но логика в методах достаточно сложная и во многих местах
+    // приложении падало с ошибкой что соединение было уже закрыто. Пока не хватило времени во всех местах
+    // разобраться с транзакционностью и закрытием открытием потоков, поэтому упростил с потенциальной утечкой памяти
+    private UserRepository userRepository;
+    private ReadingRepository readingRepository;
+    private MeterRepository meterRepository;
+    private ActionRepository actionRepository;
 
     @Override
     public void addReading(AddReadingRqDto dto) {
+        Connection connection = DataBaseConnector.getConnection();
+        userRepository = new JdbcUserRepository(connection);
+        meterRepository = new JdbcMeterRepository(connection);
+        readingRepository = new JdbcReadingRepository(connection);
         User user = userRepository.getUserById(dto.userId());
         Meter meter = meterRepository.getMeterById(dto.meterId());
         ReadingRqDto currentReadingDto = ReadingRqDto.builder()
                 .userId(dto.userId())
                 .meterId(dto.meterId())
                 .build();
-        Optional<Reading> currentReading = readingRepository.getCurrentReading(currentReadingDto);
+        Optional<ReadingRs> currentReading = readingRepository.getCurrentReading(currentReadingDto);
         if (currentReading.isPresent() && currentReading.get().getDate().getMonth() == LocalDate.now().getMonth()) {
-            // пока кидаю рантайм для скорости при переходе
-            // на web конечно буду выбрасывать понятную ошибку без прекращения работы приложения
             throw new RuntimeException("За этот месяц Вы уже сдавали показания");
         }
         if (currentReading.isPresent()) {
-            Reading oldCurrentReading = currentReading.get();
-            oldCurrentReading.setCurrent(false);
+            ReadingInMonthRq rq = ReadingInMonthRq.builder()
+                    .userId(dto.userId())
+                    .meterId(dto.meterId())
+                    .month(currentReading.get().getDate().getMonth())
+                    .build();
+            Optional<Reading> reading = readingRepository.getReadingForMonth(rq);
+            reading.ifPresent(value -> value.setCurrent(false));
+            readingRepository.save(reading.get());
         }
         Reading reading = Reading.builder()
-                .id(id.incrementAndGet())
                 .user(user)
                 .meter(meter)
                 .meterReading(dto.readout())
@@ -59,24 +66,56 @@ public class MonitoringServiceImpl implements MonitoringService {
                 .isCurrent(true)
                 .build();
         readingRepository.addReading(reading);
-        auditService.addAction(new Action(user, Activity.SUBMITTED, LocalDateTime.now()));
+        Action action = Action.builder()
+                .user(user)
+                .activity(Activity.SUBMITTED)
+                .dateTime(LocalDateTime.now())
+                .build();
+        actionRepository.addAction(action);
     }
 
-    public Optional<Reading> getCurrentReading(ReadingRqDto dto) {
+    public Optional<ReadingRs> getCurrentReading(ReadingRqDto dto) {
+        Connection connection = DataBaseConnector.getConnection();
+        userRepository = new JdbcUserRepository(connection);
+        readingRepository = new JdbcReadingRepository(connection);
         User user = userRepository.getUserById(dto.userId());
-        auditService.addAction(new Action(user, Activity.REQUESTED, LocalDateTime.now()));
+        Action action = Action.builder()
+                .user(user)
+                .activity(Activity.REQUESTED)
+                .dateTime(LocalDateTime.now())
+                .build();
+        actionRepository.addAction(action);
         return readingRepository.getCurrentReading(dto);
     }
 
     @Override
     public Optional<Reading> getReadingForMonth(ReadingInMonthRq rq) {
+        Connection connection = DataBaseConnector.getConnection();
+        userRepository = new JdbcUserRepository(connection);
+        readingRepository = new JdbcReadingRepository(connection);
         User user = userRepository.getUserById(rq.userId());
-        auditService.addAction(new Action(user, Activity.REQUESTED, LocalDateTime.now()));
+        Action action = Action.builder()
+                .user(user)
+                .activity(Activity.REQUESTED)
+                .dateTime(LocalDateTime.now())
+                .build();
+        actionRepository.addAction(action);
         return readingRepository.getReadingForMonth(rq);
     }
 
     @Override
     public List<Reading> historyReadingsByUserId(long userId) {
+        Connection connection = DataBaseConnector.getConnection();
+        readingRepository = new JdbcReadingRepository(connection);
+        actionRepository = new JdbcActionRepository(connection);
+        userRepository = new JdbcUserRepository(connection);
+        User user = userRepository.getUserById(userId);
+        Action action = Action.builder()
+                .user(user)
+                .activity(Activity.HISTORY)
+                .dateTime(LocalDateTime.now())
+                .build();
+        actionRepository.addAction(action);
         return readingRepository.historyReadingsByUserId(userId);
     }
 }

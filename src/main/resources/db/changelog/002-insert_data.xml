@@ -1,0 +1,44 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet author="petrov" id="insert_initial_meter_values" runOnChange="true">
+        <insert tableName="meter" schemaName="domain">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="HOT_WATER"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="petrov" id="insert_cold_meter_values" runOnChange="true">
+        <insert tableName="meter" schemaName="domain">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="COLD_WATER"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="petrov" id="insert_heating_meter_values">
+        <insert tableName="meter" schemaName="domain">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="HEATING"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="petrov" id="insert_user_values">
+        <insert tableName="users" schemaName="domain">
+            <column name="id" valueNumeric="1"/>
+            <column name="user_name" value="user"/>
+            <column name="password" value="user"/>
+            <column name="role" value="USER"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="petrov" id="insert_admin_values">
+        <insert tableName="users" schemaName="domain">
+            <column name="id" valueNumeric="2"/>
+            <column name="user_name" value="admin"/>
+            <column name="password" value="admin"/>
+            <column name="role" value="ADMIN"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

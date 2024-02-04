@@ -1,0 +1,11 @@
+version: '3'
+services:
+  database:
+    image: postgres
+    container_name: tracking_db
+    ports:
+      - "5401:5432"
+    environment:
+      POSTGRES_DB: tracking_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres

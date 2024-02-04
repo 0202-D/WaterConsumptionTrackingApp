@@ -1,48 +1,103 @@
 package io.ylab.petrov.service.auth;
 
-import io.ylab.petrov.dao.user.InMemoryUserRepositoryImpl;
+import io.ylab.petrov.dao.audit.ActionRepository;
+import io.ylab.petrov.dao.audit.JdbcActionRepository;
+import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
 import io.ylab.petrov.dto.AuthReqDto;
 import io.ylab.petrov.model.audit.Action;
 import io.ylab.petrov.model.audit.Activity;
 import io.ylab.petrov.model.user.User;
-import io.ylab.petrov.service.audit.AuditService;
-import io.ylab.petrov.service.audit.AuditServiceImpl;
+import io.ylab.petrov.utils.DataBaseConnector;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class AuthServiceImpl implements AuthService {
-    private static AtomicLong userId = new AtomicLong(2);
-    private final AuditService auditService = new AuditServiceImpl();
-    private final UserRepository userRepository = new InMemoryUserRepositoryImpl();
-
-    private final InMemoryUserRepositoryImpl inMemoryUserRepository = new InMemoryUserRepositoryImpl();
+    private ActionRepository actionRepository;
+    private UserRepository userRepository;
 
     @Override
     public boolean userRegistration(User user) {
-        User searchUser = userRepository.getUserByUserName(user.getUserName());
-        if(searchUser!=null){
-            System.out.println("Пользователь с таким именем уже существует");
+        Connection connection = DataBaseConnector.getConnection();
+        try {
+            connection.setAutoCommit(false);
+            userRepository = new JdbcUserRepository(connection);
+            actionRepository = new JdbcActionRepository(connection);
+            Optional<User> searchUser = userRepository.getUserByUserName(user.getUserName());
+            if (searchUser.isPresent()) {
+                System.out.println("Пользователь с таким именем уже существует");
+                return false;
+            }
+            userRepository.addUser(user);
+            var actionUser = userRepository.getUserByUserName(user.getUserName())
+                    .orElseThrow(() -> new RuntimeException("Такого пользователя не существует"));
+            Action action = Action.builder()
+                    .user(actionUser)
+                    .activity(Activity.REGISTERED)
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            actionRepository.addAction(action);
+            connection.commit();
+            return true;
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            e.printStackTrace();
             return false;
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        user.setId(userId.incrementAndGet());
-        userRepository.addUser(user);
-        auditService.addAction(new Action(user, Activity.REGISTERED, LocalDateTime.now()));
-        return true;
     }
 
     @Override
-    public boolean authenticateUser(AuthReqDto user) {
-        Optional<User> searchUser = inMemoryUserRepository.getUsers().stream()
-                .filter(el -> el.getUserName().equals(user.userName())).findFirst();
-        if (searchUser.isEmpty()) {
-            System.out.println("Пользователя с таким именем не существует");
-            return false;
+    public Optional<User> authenticateUser(AuthReqDto user) {
+        Optional<User> searchUser = null;
+        Connection connection = DataBaseConnector.getConnection();
+        try {
+            connection.setAutoCommit(false);
+            userRepository = new JdbcUserRepository(connection);
+            actionRepository = new JdbcActionRepository(connection);
+            searchUser = userRepository.getUserByUserName(user.userName());
+            if (searchUser.isEmpty()) {
+                System.out.println("Пользователь с таким именем не существует");
+                return Optional.empty();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        auditService.addAction(new Action(searchUser.get(), Activity.ENTERED, LocalDateTime.now()));
-        return searchUser.get().getPassword().equals(user.password());
+        Action action = Action.builder()
+                .user(searchUser.get())
+                .activity(Activity.ENTERED)
+                .dateTime(LocalDateTime.now())
+                .build();
+        actionRepository.addAction(action);
+        return searchUser;
+    }
+
+    @Override
+    public Optional<User> getUserByUserName(String userName) {
+        return userRepository.getUserByUserName(userName);
     }
 }

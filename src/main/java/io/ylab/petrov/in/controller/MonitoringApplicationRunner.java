@@ -1,6 +1,7 @@
 package io.ylab.petrov.in.controller;
 
 import io.ylab.petrov.dao.user.InMemoryUserRepositoryImpl;
+import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
 import io.ylab.petrov.dto.ReadingInMonthRq;
 import io.ylab.petrov.dto.AddReadingRqDto;
@@ -9,20 +10,36 @@ import io.ylab.petrov.dto.ReadingRqDto;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.model.user.Role;
 import io.ylab.petrov.model.user.User;
+import io.ylab.petrov.utils.DataBaseConnector;
+import liquibase.Contexts;
+import liquibase.LabelExpression;
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.LiquibaseException;
+import liquibase.resource.ClassLoaderResourceAccessor;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.Month;
 import java.util.Optional;
 import java.util.Scanner;
 
 public class MonitoringApplicationRunner {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws LiquibaseException, SQLException {
         String input;
         String[] nameAndPassword;
         AuthController authController = new AuthController();
         MonitoringController monitoringController = new MonitoringController();
-        UserRepository userRepository = new InMemoryUserRepositoryImpl();
+     //   UserRepository userRepository = new JdbcUserRepository();
         Scanner scanner = new Scanner(System.in);
+        Connection connection1 = DataBaseConnector.getConnection();
+        Database dataBase = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection1));
+        Liquibase liquibase = new Liquibase("db/changelog/changelog.xml"
+                ,new ClassLoaderResourceAccessor(),dataBase);
+        liquibase.update(new Contexts(), new LabelExpression());
         while (true) {
             User currentUser;
             int choice = 0;
@@ -73,11 +90,11 @@ public class MonitoringApplicationRunner {
                             .userName(userName)
                             .password(password)
                             .build();
-                    boolean isAuthenticated = authController.authenticateUser(dto);
-                    if (!isAuthenticated) {
+                    Optional<User> optionalUser = authController.authenticateUser(dto);
+                    if (optionalUser.isEmpty()) {
                         continue;
                     } else {
-                        currentUser = userRepository.getUserByUserName(userName);
+                        currentUser = optionalUser.get();
                         break;
                     }
 
