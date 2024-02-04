@@ -2,6 +2,7 @@ package io.ylab.petrov.service.monitoring;
 
 
 import io.ylab.petrov.dao.audit.ActionRepository;
+import io.ylab.petrov.dao.audit.InMemoryActionRepositoryImpl;
 import io.ylab.petrov.dao.audit.JdbcActionRepository;
 import io.ylab.petrov.dao.monitoring.*;
 import io.ylab.petrov.dao.user.JdbcUserRepository;
@@ -17,7 +18,11 @@ import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.model.user.User;
 import io.ylab.petrov.utils.DataBaseConnector;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,7 +37,7 @@ public class MonitoringServiceImpl implements MonitoringService {
     private MeterRepository meterRepository;
     private ActionRepository actionRepository;
 
-    @Override
+  /*  @Override
     public void addReading(AddReadingRqDto dto) {
         Connection connection = DataBaseConnector.getConnection();
         userRepository = new JdbcUserRepository(connection);
@@ -75,7 +80,8 @@ public class MonitoringServiceImpl implements MonitoringService {
                 .build();
         actionRepository.addAction(action);
     }
-
+*/
+    @Override
     public Optional<ReadingRs> getCurrentReading(ReadingRqDto dto) {
         Connection connection = DataBaseConnector.getConnection();
         userRepository = new JdbcUserRepository(connection);
@@ -123,5 +129,83 @@ public class MonitoringServiceImpl implements MonitoringService {
         actionRepository.addAction(action);
         return readingRepository.historyReadingsByUserId(userId);
     }
+    @Override
+    public void addReading(AddReadingRqDto dto) {
+        Connection connection = DataBaseConnector.getConnection();
+        userRepository = new JdbcUserRepository(connection);
+        meterRepository = new JdbcMeterRepository(connection);
+        readingRepository = new JdbcReadingRepository(connection);
+        actionRepository = new JdbcActionRepository(connection);
+        User user = getUserById(dto.userId());
+        Meter meter = getMeterById(dto.meterId());
+
+        checkIfAlreadySubmittedForMonth(dto.userId(), dto.meterId());
+
+        updatePreviousReading(dto.userId(), dto.meterId());
+
+        saveNewReading(user, meter, dto.readout());
+
+        addAction(user, Activity.SUBMITTED);
+    }
+
+    private User getUserById(long userId) {
+        return userRepository.getUserById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
+    }
+
+    private Meter getMeterById(long meterId) {
+        return meterRepository.getMeterById(meterId);
+    }
+
+    private void checkIfAlreadySubmittedForMonth(long userId, long meterId) {
+        ReadingRqDto currentReadingDto = ReadingRqDto.builder()
+                .userId(userId)
+                .meterId(meterId)
+                .build();
+        Optional<ReadingRs> currentReading = readingRepository.getCurrentReading(currentReadingDto);
+        if (currentReading.isPresent() && currentReading.get().getDate().getMonth() == LocalDate.now().getMonth()) {
+            throw new RuntimeException("За этот месяц Вы уже сдавали показания");
+        }
+    }
+
+    private void updatePreviousReading(long userId, long meterId) {
+        ReadingRqDto currentReadingDto = ReadingRqDto.builder()
+                .userId(userId)
+                .meterId(meterId)
+                .build();
+        Optional<ReadingRs> currentReading = readingRepository.getCurrentReading(currentReadingDto);
+        if (currentReading.isPresent()) {
+            ReadingInMonthRq rq = ReadingInMonthRq.builder()
+                    .userId(userId)
+                    .meterId(meterId)
+                    .month(currentReading.get().getDate().getMonth())
+                    .build();
+            Reading reading = readingRepository.getReadingForMonth(rq)
+                    .orElseThrow(() -> new RuntimeException("Показаний с таким id не существует"));
+            reading.setCurrent(false);
+            readingRepository.save(reading);
+        }
+    }
+
+    private void saveNewReading(User user, Meter meter, BigDecimal readout) {
+        Reading reading = Reading.builder()
+                .user(user)
+                .meter(meter)
+                .meterReading(readout)
+                .date(LocalDate.now())
+                .isCurrent(true)
+                .build();
+        readingRepository.addReading(reading);
+    }
+
+    private void addAction(User user, Activity activity) {
+        Action action = Action.builder()
+                .user(user)
+                .activity(activity)
+                .dateTime(LocalDateTime.now())
+                .build();
+        actionRepository.addAction(action);
+    }
+
 }
 
