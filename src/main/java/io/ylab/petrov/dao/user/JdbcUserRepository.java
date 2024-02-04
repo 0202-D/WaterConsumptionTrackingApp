@@ -13,28 +13,26 @@ public class JdbcUserRepository implements UserRepository{
         this.connection = connection;
     }
     // Метод для получения пользователя по идентификатору
-    public User getUserById(long userId) {
+    public Optional<User> getUserById(long userId) {
         String sql = "SELECT * FROM domain.users WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, userId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    // Создаем и возвращаем объект User с данными из базы данных
                     User user = new User();
                     user.setId(resultSet.getLong("id"));
                     user.setUserName(resultSet.getString("user_name"));
                     user.setPassword(resultSet.getString("password"));
                     user.setRole(Role.valueOf(resultSet.getString("role")));
-                    return user;
+                    return Optional.of(user);
                 } else {
                     System.out.println("Пользователя с таким id не существует");
-                    return null;
+                    return Optional.empty();
                 }
             }
         } catch (SQLException e) {
-            // Обработка ошибок
             e.printStackTrace();
-            return null;
+            return Optional.empty();
         }
     }
 

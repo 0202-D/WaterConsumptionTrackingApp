@@ -10,6 +10,8 @@ import io.ylab.petrov.dto.ReadingRqDto;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.model.user.Role;
 import io.ylab.petrov.model.user.User;
+import io.ylab.petrov.service.auth.AuthService;
+import io.ylab.petrov.service.auth.AuthServiceImpl;
 import io.ylab.petrov.utils.DataBaseConnector;
 import liquibase.Contexts;
 import liquibase.LabelExpression;
@@ -31,9 +33,9 @@ public class MonitoringApplicationRunner {
     public static void main(String[] args) throws LiquibaseException, SQLException {
         String input;
         String[] nameAndPassword;
-        AuthController authController = new AuthController();
+        AuthService authService = new AuthServiceImpl();
+        AuthController authController = new AuthController(authService);
         MonitoringController monitoringController = new MonitoringController();
-     //   UserRepository userRepository = new JdbcUserRepository();
         Scanner scanner = new Scanner(System.in);
         Connection connection1 = DataBaseConnector.getConnection();
         Database dataBase = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection1));

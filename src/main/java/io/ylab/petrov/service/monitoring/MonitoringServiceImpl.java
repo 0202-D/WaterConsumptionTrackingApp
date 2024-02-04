@@ -15,7 +15,7 @@ import io.ylab.petrov.model.audit.Activity;
 import io.ylab.petrov.model.readout.Meter;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.model.user.User;
- import io.ylab.petrov.utils.DataBaseConnector;
+import io.ylab.petrov.utils.DataBaseConnector;
 
 import java.sql.Connection;
 import java.time.LocalDate;
@@ -38,7 +38,8 @@ public class MonitoringServiceImpl implements MonitoringService {
         userRepository = new JdbcUserRepository(connection);
         meterRepository = new JdbcMeterRepository(connection);
         readingRepository = new JdbcReadingRepository(connection);
-        User user = userRepository.getUserById(dto.userId());
+        User user = userRepository.getUserById(dto.userId())
+                .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
         Meter meter = meterRepository.getMeterById(dto.meterId());
         ReadingRqDto currentReadingDto = ReadingRqDto.builder()
                 .userId(dto.userId())
@@ -54,9 +55,10 @@ public class MonitoringServiceImpl implements MonitoringService {
                     .meterId(dto.meterId())
                     .month(currentReading.get().getDate().getMonth())
                     .build();
-            Optional<Reading> reading = readingRepository.getReadingForMonth(rq);
-            reading.ifPresent(value -> value.setCurrent(false));
-            readingRepository.save(reading.get());
+            Reading reading = readingRepository.getReadingForMonth(rq)
+                    .orElseThrow(()->new RuntimeException("Показаний с таким id не существует"));
+            reading.setCurrent(false);
+            readingRepository.save(reading);
         }
         Reading reading = Reading.builder()
                 .user(user)
@@ -78,7 +80,8 @@ public class MonitoringServiceImpl implements MonitoringService {
         Connection connection = DataBaseConnector.getConnection();
         userRepository = new JdbcUserRepository(connection);
         readingRepository = new JdbcReadingRepository(connection);
-        User user = userRepository.getUserById(dto.userId());
+        User user = userRepository.getUserById(dto.userId())
+                .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
         Action action = Action.builder()
                 .user(user)
                 .activity(Activity.REQUESTED)
@@ -93,7 +96,8 @@ public class MonitoringServiceImpl implements MonitoringService {
         Connection connection = DataBaseConnector.getConnection();
         userRepository = new JdbcUserRepository(connection);
         readingRepository = new JdbcReadingRepository(connection);
-        User user = userRepository.getUserById(rq.userId());
+        User user = userRepository.getUserById(rq.userId())
+                .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
         Action action = Action.builder()
                 .user(user)
                 .activity(Activity.REQUESTED)
@@ -109,7 +113,8 @@ public class MonitoringServiceImpl implements MonitoringService {
         readingRepository = new JdbcReadingRepository(connection);
         actionRepository = new JdbcActionRepository(connection);
         userRepository = new JdbcUserRepository(connection);
-        User user = userRepository.getUserById(userId);
+        User user = userRepository.getUserById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
         Action action = Action.builder()
                 .user(user)
                 .activity(Activity.HISTORY)

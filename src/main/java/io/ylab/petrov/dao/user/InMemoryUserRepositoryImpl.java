@@ -34,7 +34,7 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User getUserById(long userId) {
+    public Optional<User> getUserById(long userId) {
         Optional<User> user = users.stream().filter(e -> e.getId() == userId).findFirst();
         if (user.isEmpty()) {
             System.out.println("Пользователя с таким id не существует");
