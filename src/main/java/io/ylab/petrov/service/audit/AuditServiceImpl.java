@@ -13,13 +13,13 @@ public class AuditServiceImpl implements AuditService{
     private ActionRepository actionRepository;
    public void addAction(Action action){
        Connection connection = DataBaseConnector.getConnection();
-       actionRepository = new JdbcActionRepository(connection);
+       actionRepository = new JdbcActionRepository();
        actionRepository.addAction(action);
     }
 
     public List<Action> getAllByUserName(String userName){
         Connection connection = DataBaseConnector.getConnection();
-        actionRepository = new JdbcActionRepository(connection);
+        actionRepository = new JdbcActionRepository();
        return actionRepository.getAllByUserName(userName);
 
     }

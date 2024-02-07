@@ -10,6 +10,7 @@ import io.ylab.petrov.model.user.User;
 import io.ylab.petrov.service.auth.AuthService;
 import io.ylab.petrov.service.auth.AuthServiceImpl;
 import io.ylab.petrov.utils.DataBaseConnector;
+import io.ylab.petrov.utils.DbStarter;
 import liquibase.Contexts;
 import liquibase.LabelExpression;
 import liquibase.Liquibase;
@@ -34,11 +35,8 @@ public class MonitoringApplicationRunner {
         AuthController authController = new AuthController(authService);
         MonitoringController monitoringController = new MonitoringController();
         Scanner scanner = new Scanner(System.in);
-        Connection connection1 = DataBaseConnector.getConnection();
-        Database dataBase = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection1));
-        Liquibase liquibase = new Liquibase("db/changelog/changelog.xml"
-                ,new ClassLoaderResourceAccessor(),dataBase);
-        liquibase.update(new Contexts(), new LabelExpression());
+        DbStarter dbStarter = new DbStarter();
+        dbStarter.start();
         while (true) {
             User currentUser;
             int choice = 0;

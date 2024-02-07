@@ -24,8 +24,8 @@ public class AuthServiceImpl implements AuthService {
         Connection connection = DataBaseConnector.getConnection();
         try {
             connection.setAutoCommit(false);
-            userRepository = new JdbcUserRepository(connection);
-            actionRepository = new JdbcActionRepository(connection);
+            userRepository = new JdbcUserRepository();
+            actionRepository = new JdbcActionRepository();
             Optional<User> searchUser = userRepository.getUserByUserName(user.getUserName());
             if (searchUser.isPresent()) {
                 System.out.println("Пользователь с таким именем уже существует");
@@ -69,8 +69,8 @@ public class AuthServiceImpl implements AuthService {
         Connection connection = DataBaseConnector.getConnection();
         try {
             connection.setAutoCommit(false);
-            userRepository = new JdbcUserRepository(connection);
-            actionRepository = new JdbcActionRepository(connection);
+            userRepository = new JdbcUserRepository();
+            actionRepository = new JdbcActionRepository();
             searchUser = userRepository.getUserByUserName(user.userName());
             if (searchUser.isEmpty()) {
                 System.out.println("Пользователь с таким именем не существует");

@@ -6,7 +6,7 @@
         <sql>CREATE SCHEMA IF NOT EXISTS domain;</sql>
         <createTable tableName="users" schemaName="domain" >
             <column name="id" type="bigint" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
+                <constraints primaryKey="true" nullable="false" unique="true"/>
             </column>
             <column name="user_name" type="varchar(255)">
                 <constraints nullable="false"/>
@@ -31,7 +31,7 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="varchar(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" unique="true"/>
             </column>
         </createTable>
         <createTable tableName="action" schemaName="domain">

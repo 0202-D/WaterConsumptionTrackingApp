@@ -26,7 +26,12 @@ public class InMemoryReadingRepositoryImpl implements ReadingRepository {
                 .filter(el -> el.getUser().getId() == dto.userId()
                         && el.getMeter().getId() == dto.meterId()
                         && el.isCurrent()).findFirst();
-        return Optional.ofNullable(ReadingRs.builder().date(reading.get().getDate()).reading(reading.get().getMeterReading()).build());
+        return Optional.ofNullable(ReadingRs.builder()
+                .date(reading.get()
+                        .getDate())
+                .reading(reading.get()
+                        .getMeterReading())
+                .build());
     }
 
     @Override
@@ -39,11 +44,13 @@ public class InMemoryReadingRepositoryImpl implements ReadingRepository {
 
     @Override
     public List<Reading> historyReadingsByUserId(long id) {
-        return readings.stream().filter(el -> el.getUser().getId() == id).collect(Collectors.toList());
+        return readings.stream()
+                .filter(el -> el.getUser().getId() == id)
+                .collect(Collectors.toList());
     }
 
     @Override
     public void save(Reading reading) {
-        
+
     }
 }

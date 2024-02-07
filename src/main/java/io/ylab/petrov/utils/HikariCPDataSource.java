@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class HikariCPDataSource {
-    private static final String URL = "jdbc:postgresql://localhost:5432/wallet";
+    private static final String URL = "jdbc:postgresql://localhost:5401/tracking_db";
     private static final String USERNAME = "postgres";
     private static final String PASSWORD = "postgres";
     private static HikariConfig config = new HikariConfig();
