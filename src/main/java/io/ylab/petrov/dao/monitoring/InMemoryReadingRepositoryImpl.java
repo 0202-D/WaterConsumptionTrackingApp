@@ -2,6 +2,7 @@ package io.ylab.petrov.dao.monitoring;
 
 import io.ylab.petrov.dto.ReadingInMonthRq;
 import io.ylab.petrov.dto.ReadingRqDto;
+import io.ylab.petrov.dto.ReadingRs;
 import io.ylab.petrov.model.readout.Reading;
 import lombok.Data;
 
@@ -20,11 +21,17 @@ public class InMemoryReadingRepositoryImpl implements ReadingRepository {
     }
 
     @Override
-    public Optional<Reading> getCurrentReading(ReadingRqDto dto) {
-        return readings.stream()
+    public Optional<ReadingRs> getCurrentReading(ReadingRqDto dto) {
+        Optional<Reading> reading = readings.stream()
                 .filter(el -> el.getUser().getId() == dto.userId()
                         && el.getMeter().getId() == dto.meterId()
                         && el.isCurrent()).findFirst();
+        return Optional.ofNullable(ReadingRs.builder()
+                .date(reading.get()
+                        .getDate())
+                .reading(reading.get()
+                        .getMeterReading())
+                .build());
     }
 
     @Override
@@ -37,6 +44,13 @@ public class InMemoryReadingRepositoryImpl implements ReadingRepository {
 
     @Override
     public List<Reading> historyReadingsByUserId(long id) {
-        return readings.stream().filter(el -> el.getUser().getId() == id).collect(Collectors.toList());
+        return readings.stream()
+                .filter(el -> el.getUser().getId() == id)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void save(Reading reading) {
+
     }
 }

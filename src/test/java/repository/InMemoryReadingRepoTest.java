@@ -3,6 +3,7 @@ package repository;
 import io.ylab.petrov.dao.monitoring.InMemoryReadingRepositoryImpl;
 import io.ylab.petrov.dto.ReadingInMonthRq;
 import io.ylab.petrov.dto.ReadingRqDto;
+import io.ylab.petrov.dto.ReadingRs;
 import io.ylab.petrov.model.readout.Meter;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.model.user.Role;
@@ -31,22 +32,22 @@ class InMemoryReadingRepoTest {
     void testGetCurrentReading() {
         InMemoryReadingRepositoryImpl repository = new InMemoryReadingRepositoryImpl();
         Reading reading1 = new Reading();
-        reading1.setUser(new User(1, "user1", "login1", Role.USER));
-        reading1.setMeter(new Meter(1, "meter1"));
+        reading1.setUser(new User(1L, "user1", "login1", Role.USER));
+        reading1.setMeter(new Meter(1L, "meter1"));
         reading1.setCurrent(true);
         repository.addReading(reading1);
 
         Reading reading2 = new Reading();
-        reading2.setUser(new User(2, "user2", "login2", Role.USER));
-        reading2.setMeter(new Meter(2, "meter2"));
+        reading2.setUser(new User(2L, "user2", "login2", Role.USER));
+        reading2.setMeter(new Meter(2L, "meter2"));
         reading2.setCurrent(false);
         repository.addReading(reading2);
 
         ReadingRqDto dto = new ReadingRqDto(1, 1);
-        Optional<Reading> result = repository.getCurrentReading(dto);
-
+        Optional<ReadingRs> result = repository.getCurrentReading(dto);
+        ReadingRs readingRs = ReadingRs.builder().reading(reading1.getMeterReading()).date(reading1.getDate()).build();
         Assertions.assertTrue(result.isPresent());
-        Assertions.assertEquals(reading1, result.get());
+        Assertions.assertEquals(readingRs, result.get());
     }
 
     @Test
@@ -54,14 +55,14 @@ class InMemoryReadingRepoTest {
     void testGetReadingForMonth() {
         InMemoryReadingRepositoryImpl repository = new InMemoryReadingRepositoryImpl();
         Reading reading1 = new Reading();
-        reading1.setUser(new User(1, "user1", "login1", Role.USER));
-        reading1.setMeter(new Meter(1, "meter1"));
+        reading1.setUser(new User(1L, "user1", "login1", Role.USER));
+        reading1.setMeter(new Meter(1L, "meter1"));
         reading1.setDate(LocalDate.of(2022, 1, 1));
         repository.addReading(reading1);
 
         Reading reading2 = new Reading();
-        reading2.setUser(new User(2, "user2", "login2", Role.USER));
-        reading2.setMeter(new Meter(2, "meter2"));
+        reading2.setUser(new User(2L, "user2", "login2", Role.USER));
+        reading2.setMeter(new Meter(2L, "meter2"));
         reading2.setDate(LocalDate.of(2022, 2, 1));
         repository.addReading(reading2);
 

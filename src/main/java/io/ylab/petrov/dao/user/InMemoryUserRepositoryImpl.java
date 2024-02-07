@@ -34,22 +34,22 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User getUserById(long userId) {
+    public Optional<User> getUserById(long userId) {
         Optional<User> user = users.stream().filter(e -> e.getId() == userId).findFirst();
         if (user.isEmpty()) {
             System.out.println("Пользователя с таким id не существует");
             return null;
         }
-        return user.get();
+        return user;
     }
 
     @Override
-    public User getUserByUserName(String userName) {
+    public Optional<User> getUserByUserName(String userName) {
         Optional<User> user = users.stream().filter(el -> el.getUserName().equals(userName)).findFirst();
         if (user.isEmpty()) {
             System.out.println("Пользователя с таким userName не существует");
-            return null;
+            return Optional.empty();
         }
-        return user.get();
+        return user;
     }
 }

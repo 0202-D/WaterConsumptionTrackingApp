@@ -1,12 +1,16 @@
 # WaterConsumptionTrackingApp
 Консольное приложение для подачи показаний счетчиков отопления, горячей и холодной воды
+Используемые технологии : Java  17, PostgreSQL, Docker
+Для запуска базы данных используется docker контейнер, 
+для этого выполните в корне проекта команду docker-compose up 
+или запустите docker file с помощью intellij idea
 По умолчанию при запуске приложения создаются два пользователя : 
-userName - user
-password - user 
+userName - user,
+password - user,
 с ролью USER 
 и 
-userName - admin
-password - admin
+userName - admin,
+password - admin,
 с ролью ADMIN
 
 Так же создаются три счетчика :
