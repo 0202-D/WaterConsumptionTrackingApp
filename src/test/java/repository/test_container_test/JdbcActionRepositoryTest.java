@@ -74,7 +74,7 @@ public class JdbcActionRepositoryTest {
 
     @Test
     void testAddAction() throws SQLException {
-        JdbcActionRepository actionRepository = new JdbcActionRepository(connection);
+        JdbcActionRepository actionRepository = new JdbcActionRepository();
         Action action = Utils.getAction();
         Action action2 = Utils.getActionExited();
         actionRepository.addAction(action);
@@ -88,7 +88,7 @@ public class JdbcActionRepositoryTest {
 
     @Test
     void testGetAllByUserName() throws SQLException {
-        JdbcActionRepository actionRepository = new JdbcActionRepository(connection);
+        JdbcActionRepository actionRepository = new JdbcActionRepository();
         Action action1 = Utils.getAction();
         Action action2 = Utils.getActionExited();
         actionRepository.addAction(action1);

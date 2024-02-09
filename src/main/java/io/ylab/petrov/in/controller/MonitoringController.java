@@ -16,8 +16,8 @@ import java.util.Optional;
 public class MonitoringController {
     private final MonitoringService monitoringService = new MonitoringServiceImpl();
 
-    public void addReading(AddReadingRqDto dto) {
-        monitoringService.addReading(dto);
+    public boolean addReading(AddReadingRqDto dto) {
+        return monitoringService.addReading(dto);
     }
 
     public ReadingRs getCurrentReading(ReadingRqDto dto) {

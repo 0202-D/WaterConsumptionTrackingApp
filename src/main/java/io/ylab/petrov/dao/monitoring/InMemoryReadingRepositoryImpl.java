@@ -23,8 +23,8 @@ public class InMemoryReadingRepositoryImpl implements ReadingRepository {
     @Override
     public Optional<ReadingRs> getCurrentReading(ReadingRqDto dto) {
         Optional<Reading> reading = readings.stream()
-                .filter(el -> el.getUser().getId() == dto.userId()
-                        && el.getMeter().getId() == dto.meterId()
+                .filter(el -> el.getUser().getId() == dto.getUserId()
+                        && el.getMeter().getId() == dto.getMeterId()
                         && el.isCurrent()).findFirst();
         return Optional.ofNullable(ReadingRs.builder()
                 .date(reading.get()

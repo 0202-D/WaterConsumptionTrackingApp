@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MonitoringService {
-    void addReading(AddReadingRqDto dto);
+    boolean addReading(AddReadingRqDto dto);
 
     Optional<ReadingRs> getCurrentReading(ReadingRqDto dto);
 

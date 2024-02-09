@@ -1,9 +1,9 @@
 package io.ylab.petrov.in.controller;
 
-import io.ylab.petrov.dto.AuthReqDto;
+import io.ylab.petrov.dto.user.UserDtoRs;
+import io.ylab.petrov.dto.user.UserRqDto;
 import io.ylab.petrov.model.user.User;
 import io.ylab.petrov.service.auth.AuthService;
-import io.ylab.petrov.service.auth.AuthServiceImpl;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
@@ -11,11 +11,11 @@ import java.util.Optional;
 public class AuthController {
     private final AuthService authService;
 
-    public boolean addUser(User user) {
+    public UserDtoRs addUser(User user) {
         return authService.userRegistration(user);
     }
 
-    public Optional<User> authenticateUser(AuthReqDto dto) {
+    public UserDtoRs authenticateUser(UserRqDto dto) {
         return authService.authenticateUser(dto);
     }
 

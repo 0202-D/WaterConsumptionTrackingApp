@@ -12,13 +12,11 @@ import java.util.List;
 public class AuditServiceImpl implements AuditService{
     private ActionRepository actionRepository;
    public void addAction(Action action){
-       Connection connection = DataBaseConnector.getConnection();
        actionRepository = new JdbcActionRepository();
        actionRepository.addAction(action);
     }
 
     public List<Action> getAllByUserName(String userName){
-        Connection connection = DataBaseConnector.getConnection();
         actionRepository = new JdbcActionRepository();
        return actionRepository.getAllByUserName(userName);
 

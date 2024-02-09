@@ -1,7 +1,16 @@
 package io.ylab.petrov.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
-public record ReadingRqDto(long userId, long meterId) {
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class ReadingRqDto {
+    @NotBlank private long userId;
+    @NotBlank private long meterId;
 }

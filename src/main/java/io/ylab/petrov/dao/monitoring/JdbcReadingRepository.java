@@ -19,9 +19,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class JdbcReadingRepository implements ReadingRepository {
-    private UserRepository userRepository;
-
-    private MeterRepository meterRepository;
+    private UserRepository userRepository = new JdbcUserRepository();
+    private MeterRepository meterRepository = new JdbcMeterRepository();
 
     @Override
     public void addReading(Reading reading) {
@@ -44,8 +43,8 @@ public class JdbcReadingRepository implements ReadingRepository {
         String query = "SELECT * FROM domain.reading WHERE user_id = ? AND meter_id = ? AND is_current =true ";
         try (Connection connection = HikariCPDataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, dto.userId());
-            statement.setLong(2, dto.meterId());
+            statement.setLong(1, dto.getUserId());
+            statement.setLong(2, dto.getMeterId());
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     ReadingRs reading = ReadingRs.builder()
@@ -128,9 +127,8 @@ public class JdbcReadingRepository implements ReadingRepository {
     @Override
     public void save(Reading reading) {
         String query = "UPDATE domain.reading set is_current=false where id=" + reading.getId();
-        try {
-            Connection connection = HikariCPDataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
+        try (Connection connection = HikariCPDataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

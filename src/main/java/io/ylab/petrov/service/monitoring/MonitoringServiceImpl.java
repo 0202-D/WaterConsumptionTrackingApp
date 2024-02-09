@@ -1,6 +1,7 @@
 package io.ylab.petrov.service.monitoring;
 
 
+import io.ylab.petrov.aop.annotation.Loggable;
 import io.ylab.petrov.dao.audit.ActionRepository;
 import io.ylab.petrov.dao.audit.InMemoryActionRepositoryImpl;
 import io.ylab.petrov.dao.audit.JdbcActionRepository;
@@ -16,11 +17,8 @@ import io.ylab.petrov.model.audit.Activity;
 import io.ylab.petrov.model.readout.Meter;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.model.user.User;
-import io.ylab.petrov.utils.HikariCPDataSource;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,8 +31,9 @@ public class MonitoringServiceImpl implements MonitoringService {
     private final ActionRepository actionRepository = new JdbcActionRepository();
 
     @Override
+    @Loggable
     public Optional<ReadingRs> getCurrentReading(ReadingRqDto dto) {
-        User user = userRepository.getUserById(dto.userId())
+        User user = userRepository.getUserById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
         Action action = Action.builder()
                 .user(user)
@@ -71,13 +70,14 @@ public class MonitoringServiceImpl implements MonitoringService {
     }
 
     @Override
-    public void addReading(AddReadingRqDto dto) {
+    public boolean addReading(AddReadingRqDto dto) {
             User user = getUserById(dto.userId());
             Meter meter = getMeterById(dto.meterId());
             checkIfAlreadySubmittedForMonth(dto.userId(), dto.meterId());
             updatePreviousReading(dto.userId(), dto.meterId());
             saveNewReading(user, meter, dto.readout());
             addAction(user, Activity.SUBMITTED);
+            return true;
     }
 
     private User getUserById(long userId) {
