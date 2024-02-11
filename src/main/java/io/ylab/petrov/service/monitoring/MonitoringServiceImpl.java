@@ -3,15 +3,14 @@ package io.ylab.petrov.service.monitoring;
 
 import io.ylab.petrov.aop.annotation.Loggable;
 import io.ylab.petrov.dao.audit.ActionRepository;
-import io.ylab.petrov.dao.audit.InMemoryActionRepositoryImpl;
 import io.ylab.petrov.dao.audit.JdbcActionRepository;
 import io.ylab.petrov.dao.monitoring.*;
 import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
-import io.ylab.petrov.dto.AddReadingRqDto;
-import io.ylab.petrov.dto.ReadingInMonthRq;
-import io.ylab.petrov.dto.ReadingRqDto;
-import io.ylab.petrov.dto.ReadingRs;
+import io.ylab.petrov.dto.monitoring.AddReadingRqDto;
+import io.ylab.petrov.dto.monitoring.ReadingInMonthRqDto;
+import io.ylab.petrov.dto.monitoring.ReadingRqDto;
+import io.ylab.petrov.dto.monitoring.ReadingRsDto;
 import io.ylab.petrov.model.audit.Action;
 import io.ylab.petrov.model.audit.Activity;
 import io.ylab.petrov.model.readout.Meter;
@@ -32,41 +31,24 @@ public class MonitoringServiceImpl implements MonitoringService {
 
     @Override
     @Loggable
-    public Optional<ReadingRs> getCurrentReading(ReadingRqDto dto) {
+    public Optional<ReadingRsDto> getCurrentReading(ReadingRqDto dto) {
         User user = userRepository.getUserById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
-        Action action = Action.builder()
-                .user(user)
-                .activity(Activity.REQUESTED)
-                .dateTime(LocalDateTime.now())
-                .build();
-        actionRepository.addAction(action);
         return readingRepository.getCurrentReading(dto);
     }
+
     @Override
-    public Optional<Reading> getReadingForMonth(ReadingInMonthRq rq) {
-            User user = userRepository.getUserById(rq.userId())
-                    .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
-            Action action = Action.builder()
-                    .user(user)
-                    .activity(Activity.REQUESTED)
-                    .dateTime(LocalDateTime.now())
-                    .build();
-            actionRepository.addAction(action);
-            return readingRepository.getReadingForMonth(rq);
+    public Optional<Reading> getReadingForMonth(ReadingInMonthRqDto rq) {
+        User user = userRepository.getUserById(rq.userId())
+                .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
+        return readingRepository.getReadingForMonth(rq);
     }
 
     @Override
     public List<Reading> historyReadingsByUserId(long userId) {
-            User user = userRepository.getUserById(userId)
-                    .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
-            Action action = Action.builder()
-                    .user(user)
-                    .activity(Activity.HISTORY)
-                    .dateTime(LocalDateTime.now())
-                    .build();
-            actionRepository.addAction(action);
-            return readingRepository.historyReadingsByUserId(userId);
+        User user = userRepository.getUserById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
+        return readingRepository.historyReadingsByUserId(userId);
     }
 
     @Override
@@ -76,7 +58,6 @@ public class MonitoringServiceImpl implements MonitoringService {
             checkIfAlreadySubmittedForMonth(dto.userId(), dto.meterId());
             updatePreviousReading(dto.userId(), dto.meterId());
             saveNewReading(user, meter, dto.readout());
-            addAction(user, Activity.SUBMITTED);
             return true;
     }
 
@@ -94,7 +75,7 @@ public class MonitoringServiceImpl implements MonitoringService {
                 .userId(userId)
                 .meterId(meterId)
                 .build();
-        Optional<ReadingRs> currentReading = readingRepository.getCurrentReading(currentReadingDto);
+        Optional<ReadingRsDto> currentReading = readingRepository.getCurrentReading(currentReadingDto);
         if (currentReading.isPresent() && currentReading.get().getDate().getMonth() == LocalDate.now().getMonth()) {
             throw new RuntimeException("За этот месяц Вы уже сдавали показания");
         }
@@ -105,9 +86,9 @@ public class MonitoringServiceImpl implements MonitoringService {
                 .userId(userId)
                 .meterId(meterId)
                 .build();
-        Optional<ReadingRs> currentReading = readingRepository.getCurrentReading(currentReadingDto);
+        Optional<ReadingRsDto> currentReading = readingRepository.getCurrentReading(currentReadingDto);
         if (currentReading.isPresent()) {
-            ReadingInMonthRq rq = ReadingInMonthRq.builder()
+            ReadingInMonthRqDto rq = ReadingInMonthRqDto.builder()
                     .userId(userId)
                     .meterId(meterId)
                     .month(currentReading.get().getDate().getMonth())
@@ -128,15 +109,6 @@ public class MonitoringServiceImpl implements MonitoringService {
                 .isCurrent(true)
                 .build();
         readingRepository.addReading(reading);
-    }
-
-    private void addAction(User user, Activity activity) {
-        Action action = Action.builder()
-                .user(user)
-                .activity(activity)
-                .dateTime(LocalDateTime.now())
-                .build();
-        actionRepository.addAction(action);
     }
 }
 

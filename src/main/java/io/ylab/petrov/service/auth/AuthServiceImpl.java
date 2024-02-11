@@ -4,8 +4,7 @@ import io.ylab.petrov.dao.audit.ActionRepository;
 import io.ylab.petrov.dao.audit.JdbcActionRepository;
 import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
-import io.ylab.petrov.dto.AuthReqDto;
-import io.ylab.petrov.dto.user.UserDtoRs;
+import io.ylab.petrov.dto.user.UserRsDto;
 import io.ylab.petrov.dto.user.UserRqDto;
 import io.ylab.petrov.exception.NotFoundException;
 import io.ylab.petrov.mapper.user.UserMapper;
@@ -27,7 +26,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserMapper userMapper = new UserMapperImpl();
 
     @Override
-    public UserDtoRs userRegistration(User user) {
+    public UserRsDto userRegistration(User user) {
         if (!checkExistUserByUserName(user.getUserName())) {
             return null;
         }
@@ -45,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserDtoRs authenticateUser(UserRqDto user) {
+    public UserRsDto authenticateUser(UserRqDto user) {
         Optional<User> searchUser = userRepository.getUserByUserName(user.getUserName());
         if (searchUser.isEmpty()) {
             return null;

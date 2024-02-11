@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 /**
  * dto ответа на регистрацию и аутентификацию пользователя
  */
-public class UserDtoRs {
+public class UserRsDto {
     /**
      * идентификатор пользователя
      */

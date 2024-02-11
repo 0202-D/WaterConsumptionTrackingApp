@@ -1,8 +1,8 @@
 package io.ylab.petrov.dao.monitoring;
 
-import io.ylab.petrov.dto.ReadingInMonthRq;
-import io.ylab.petrov.dto.ReadingRqDto;
-import io.ylab.petrov.dto.ReadingRs;
+import io.ylab.petrov.dto.monitoring.ReadingInMonthRqDto;
+import io.ylab.petrov.dto.monitoring.ReadingRqDto;
+import io.ylab.petrov.dto.monitoring.ReadingRsDto;
 import io.ylab.petrov.model.readout.Reading;
 import lombok.Data;
 
@@ -21,12 +21,12 @@ public class InMemoryReadingRepositoryImpl implements ReadingRepository {
     }
 
     @Override
-    public Optional<ReadingRs> getCurrentReading(ReadingRqDto dto) {
+    public Optional<ReadingRsDto> getCurrentReading(ReadingRqDto dto) {
         Optional<Reading> reading = readings.stream()
                 .filter(el -> el.getUser().getId() == dto.getUserId()
                         && el.getMeter().getId() == dto.getMeterId()
                         && el.isCurrent()).findFirst();
-        return Optional.ofNullable(ReadingRs.builder()
+        return Optional.ofNullable(ReadingRsDto.builder()
                 .date(reading.get()
                         .getDate())
                 .reading(reading.get()
@@ -35,7 +35,7 @@ public class InMemoryReadingRepositoryImpl implements ReadingRepository {
     }
 
     @Override
-    public Optional<Reading> getReadingForMonth(ReadingInMonthRq rq) {
+    public Optional<Reading> getReadingForMonth(ReadingInMonthRqDto rq) {
         return readings.stream()
                 .filter(el -> el.getUser().getId() == rq.userId()
                         && el.getMeter().getId() == rq.meterId()

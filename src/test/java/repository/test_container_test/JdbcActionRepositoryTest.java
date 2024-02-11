@@ -19,8 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
 public class JdbcActionRepositoryTest {
-
-    // На все репозитории написать тесты не хватило времени. Буду дописывать на следующей неделе
     private final static String CREATE_SCHEMA_IF_NOT_EXISTS_DOMAIN = "CREATE SCHEMA IF NOT EXISTS domain";
     private final static String CREATE_USER_TABLE_QUERY = "CREATE TABLE IF NOT EXISTS domain.users (" +
             "id BIGSERIAL PRIMARY KEY," +

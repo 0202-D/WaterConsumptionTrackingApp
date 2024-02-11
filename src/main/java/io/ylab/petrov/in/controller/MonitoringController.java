@@ -1,9 +1,9 @@
 package io.ylab.petrov.in.controller;
 
-import io.ylab.petrov.dto.AddReadingRqDto;
-import io.ylab.petrov.dto.ReadingInMonthRq;
-import io.ylab.petrov.dto.ReadingRqDto;
-import io.ylab.petrov.dto.ReadingRs;
+import io.ylab.petrov.dto.monitoring.AddReadingRqDto;
+import io.ylab.petrov.dto.monitoring.ReadingInMonthRqDto;
+import io.ylab.petrov.dto.monitoring.ReadingRqDto;
+import io.ylab.petrov.dto.monitoring.ReadingRsDto;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.service.monitoring.MonitoringService;
 import io.ylab.petrov.service.monitoring.MonitoringServiceImpl;
@@ -20,12 +20,12 @@ public class MonitoringController {
         return monitoringService.addReading(dto);
     }
 
-    public ReadingRs getCurrentReading(ReadingRqDto dto) {
-        Optional<ReadingRs> reading = monitoringService.getCurrentReading(dto);
+    public ReadingRsDto getCurrentReading(ReadingRqDto dto) {
+        Optional<ReadingRsDto> reading = monitoringService.getCurrentReading(dto);
         return reading.orElse(null);
     }
 
-    public Optional<Reading> getReadingForMonth(ReadingInMonthRq rq) {
+    public Optional<Reading> getReadingForMonth(ReadingInMonthRqDto rq) {
         return monitoringService.getReadingForMonth(rq);
     }
 

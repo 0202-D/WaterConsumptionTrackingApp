@@ -1,19 +1,18 @@
-package io.ylab.petrov.servlet;
+package io.ylab.petrov.in.servlet;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.gson.Gson;
-
 import io.ylab.petrov.dao.audit.ActionRepository;
 import io.ylab.petrov.dao.audit.JdbcActionRepository;
 import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
-import io.ylab.petrov.dto.user.UserDtoRs;
+import io.ylab.petrov.dto.user.UserRsDto;
 import io.ylab.petrov.dto.user.UserRqDto;
 import io.ylab.petrov.exception.ExceptionJson;
 import io.ylab.petrov.in.controller.AuthController;
-import io.ylab.petrov.mapper.user.UserMapper;
-import io.ylab.petrov.model.user.User;
+import io.ylab.petrov.security.JwtProvider;
 import io.ylab.petrov.service.auth.AuthService;
 import io.ylab.petrov.service.auth.AuthServiceImpl;
 import io.ylab.petrov.utils.DbStarter;
@@ -25,33 +24,30 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import org.mapstruct.factory.Mappers;
-
 
 import java.io.IOException;
 import java.util.Set;
 
-import static io.ylab.petrov.servlet.AuthServlet.APPLICATION_JSON;
-
-
-public class RegistrationServlet extends HttpServlet {
-    private static final String BAD_REQUEST_MESSAGE = "Пользователь с таким именем уже существует";
-    private final UserMapper mapper = Mappers.getMapper(UserMapper.class);
-    private Validator validator;
+public class AuthServlet extends HttpServlet {
+    public static final String APPLICATION_JSON = "application/json";
+    private static final String NOT_FOUND = "Такого пользователя не существует";
     private final ObjectMapper objectMapper;
     private final AuthController authController;
     private final ActionRepository actionRepository;
     private final UserRepository userRepository;
     private final AuthService authService;
+    private Validator validator;
+    private final JwtProvider jwtProvider;
 
 
-    public RegistrationServlet() {
+    public AuthServlet() {
         this.objectMapper = new ObjectMapper();
         this.objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         this.actionRepository = new JdbcActionRepository();
         this.userRepository = new JdbcUserRepository();
         this.authService = new AuthServiceImpl();
         this.authController = new AuthController(authService);
+        this.jwtProvider = new JwtProvider();
     }
 
     @Override
@@ -68,11 +64,11 @@ public class RegistrationServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType(APPLICATION_JSON);
-        final Gson gson = new Gson();
+        final var gson = new Gson();
         var body = req.getReader();
-        final var userDto = gson.fromJson(body, UserRqDto.class);
+        UserRqDto userDto = gson.fromJson(body, UserRqDto.class);
         Set<ConstraintViolation<UserRqDto>> violations = validator.validate(userDto);
         if (!violations.isEmpty()) {
             for (ConstraintViolation<UserRqDto> violation : violations) {
@@ -84,22 +80,26 @@ public class RegistrationServlet extends HttpServlet {
                 resp.setContentType(APPLICATION_JSON);
                 resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(exceptionJson));
             }
-        }
-        else {
-        User user = mapper.toEntity(userDto);
-        UserDtoRs userDtoRs = authController.addUser(user);
-        if (userDtoRs != null) {
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.setContentType(APPLICATION_JSON);
-            resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(userDtoRs));
         } else {
-            ExceptionJson exceptionJson = ExceptionJson.builder()
-                    .message(BAD_REQUEST_MESSAGE)
-                    .httpResponse(HttpServletResponse.SC_BAD_REQUEST)
-                    .build();
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.setContentType(APPLICATION_JSON);
-            resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(exceptionJson));}
+            UserRsDto userRsDto = authController.authenticateUser(userDto);
+            if (userRsDto != null) {
+                String token = jwtProvider.generateAccessJwtToken(userRsDto);
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.setContentType(APPLICATION_JSON);
+                resp.addHeader("Authorization", "Bearer " + token);
+                resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(userRsDto));
+            } else {
+                ExceptionJson exceptionJson = ExceptionJson.builder()
+                        .message(NOT_FOUND)
+                        .httpResponse(HttpServletResponse.SC_NOT_FOUND)
+                        .build();
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(exceptionJson));
+            }
         }
+    }
+
+    public void setValidator(Validator validator) {
+        this.validator = validator;
     }
 }

@@ -1,4 +1,4 @@
-package io.ylab.petrov.servlet;
+package io.ylab.petrov.in.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -8,10 +8,10 @@ import io.ylab.petrov.dao.audit.ActionRepository;
 import io.ylab.petrov.dao.audit.JdbcActionRepository;
 import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
-import io.ylab.petrov.dto.AddReadingRqDto;
-import io.ylab.petrov.dto.ReadingInMonthRq;
-import io.ylab.petrov.dto.ReadingRqDto;
-import io.ylab.petrov.dto.ReadingRs;
+import io.ylab.petrov.dto.monitoring.AddReadingRqDto;
+import io.ylab.petrov.dto.monitoring.ReadingInMonthRqDto;
+import io.ylab.petrov.dto.monitoring.ReadingRqDto;
+import io.ylab.petrov.dto.monitoring.ReadingRsDto;
 import io.ylab.petrov.exception.ExceptionJson;
 import io.ylab.petrov.exception.NotFoundException;
 import io.ylab.petrov.in.controller.MonitoringController;
@@ -87,8 +87,8 @@ public class MonitoringServlet extends HttpServlet {
                     returnForbiddenResponse(resp);
                     return;
                 }
-                ReadingRs readingRs = monitoringController.getCurrentReading(readingRqDto);
-                if (readingRs == null) {
+                ReadingRsDto readingRsDto = monitoringController.getCurrentReading(readingRqDto);
+                if (readingRsDto == null) {
                     ExceptionJson exceptionJson = ExceptionJson.builder()
                             .message(NOT_FOUND)
                             .httpResponse(HttpServletResponse.SC_NOT_FOUND)
@@ -99,7 +99,7 @@ public class MonitoringServlet extends HttpServlet {
                 } else {
                     resp.setStatus(HttpServletResponse.SC_OK);
                     resp.setContentType(APPLICATION_JSON);
-                    resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(readingRs));
+                    resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(readingRsDto));
                 }
             } else if (requestURI.contains("/user/history/")) {
                 User userPrincipal = getUserPrincipal(req);
@@ -125,7 +125,7 @@ public class MonitoringServlet extends HttpServlet {
             } else if (requestURI.contains("/user/month")) {
                 final Gson gson = new Gson();
                 var body = req.getReader();
-                final var readingInMouth = gson.fromJson(body, ReadingInMonthRq.class);
+                final var readingInMouth = gson.fromJson(body, ReadingInMonthRqDto.class);
                 User userPrincipal = getUserPrincipal(req);
                 if (userPrincipal.getId() != readingInMouth.userId() && userPrincipal.getRole() != Role.ADMIN) {
                     returnForbiddenResponse(resp);

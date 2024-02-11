@@ -5,7 +5,7 @@
          version="4.0">
    <servlet>
         <servlet-name>RegServlet</servlet-name>
-        <servlet-class>io.ylab.petrov.servlet.RegistrationServlet</servlet-class>
+        <servlet-class>io.ylab.petrov.in.servlet.RegistrationServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>RegServlet</servlet-name>
@@ -13,7 +13,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>AuthServlet</servlet-name>
-        <servlet-class>io.ylab.petrov.servlet.AuthServlet</servlet-class>
+        <servlet-class>io.ylab.petrov.in.servlet.AuthServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>AuthServlet</servlet-name>
@@ -21,7 +21,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>MonitoringServlet</servlet-name>
-        <servlet-class>io.ylab.petrov.servlet.MonitoringServlet</servlet-class>
+        <servlet-class>io.ylab.petrov.in.servlet.MonitoringServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>MonitoringServlet</servlet-name>

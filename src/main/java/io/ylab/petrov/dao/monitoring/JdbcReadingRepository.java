@@ -2,9 +2,9 @@ package io.ylab.petrov.dao.monitoring;
 
 import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
-import io.ylab.petrov.dto.ReadingInMonthRq;
-import io.ylab.petrov.dto.ReadingRqDto;
-import io.ylab.petrov.dto.ReadingRs;
+import io.ylab.petrov.dto.monitoring.ReadingInMonthRqDto;
+import io.ylab.petrov.dto.monitoring.ReadingRqDto;
+import io.ylab.petrov.dto.monitoring.ReadingRsDto;
 import io.ylab.petrov.model.readout.Meter;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.model.user.User;
@@ -39,7 +39,7 @@ public class JdbcReadingRepository implements ReadingRepository {
     }
 
     @Override
-    public Optional<ReadingRs> getCurrentReading(ReadingRqDto dto) {
+    public Optional<ReadingRsDto> getCurrentReading(ReadingRqDto dto) {
         String query = "SELECT * FROM domain.reading WHERE user_id = ? AND meter_id = ? AND is_current =true ";
         try (Connection connection = HikariCPDataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -47,7 +47,7 @@ public class JdbcReadingRepository implements ReadingRepository {
             statement.setLong(2, dto.getMeterId());
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    ReadingRs reading = ReadingRs.builder()
+                    ReadingRsDto reading = ReadingRsDto.builder()
                             .reading(resultSet.getBigDecimal("meter_reading"))
                             .date(resultSet.getDate("date").toLocalDate())
                             .build();
@@ -63,7 +63,7 @@ public class JdbcReadingRepository implements ReadingRepository {
     }
 
     @Override
-    public Optional<Reading> getReadingForMonth(ReadingInMonthRq rq) {
+    public Optional<Reading> getReadingForMonth(ReadingInMonthRqDto rq) {
         userRepository = new JdbcUserRepository();
         meterRepository = new JdbcMeterRepository();
         String query = "SELECT * FROM domain.reading WHERE user_id = ? AND meter_id = ? AND EXTRACT(MONTH FROM date) = ?";
