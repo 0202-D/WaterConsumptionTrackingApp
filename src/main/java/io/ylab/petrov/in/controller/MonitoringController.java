@@ -1,9 +1,9 @@
 package io.ylab.petrov.in.controller;
 
-import io.ylab.petrov.dto.AddReadingRqDto;
-import io.ylab.petrov.dto.ReadingInMonthRq;
-import io.ylab.petrov.dto.ReadingRqDto;
-import io.ylab.petrov.dto.ReadingRs;
+import io.ylab.petrov.dto.monitoring.AddReadingRequestDto;
+import io.ylab.petrov.dto.monitoring.ReadingInMonthRequestDto;
+import io.ylab.petrov.dto.monitoring.ReadingRequestDto;
+import io.ylab.petrov.dto.monitoring.ReadingResponseDto;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.service.monitoring.MonitoringService;
 import io.ylab.petrov.service.monitoring.MonitoringServiceImpl;
@@ -16,16 +16,16 @@ import java.util.Optional;
 public class MonitoringController {
     private final MonitoringService monitoringService = new MonitoringServiceImpl();
 
-    public void addReading(AddReadingRqDto dto) {
-        monitoringService.addReading(dto);
+    public boolean addReading(AddReadingRequestDto dto) {
+        return monitoringService.addReading(dto);
     }
 
-    public ReadingRs getCurrentReading(ReadingRqDto dto) {
-        Optional<ReadingRs> reading = monitoringService.getCurrentReading(dto);
+    public ReadingResponseDto getCurrentReading(ReadingRequestDto dto) {
+        Optional<ReadingResponseDto> reading = monitoringService.getCurrentReading(dto);
         return reading.orElse(null);
     }
 
-    public Optional<Reading> getReadingForMonth(ReadingInMonthRq rq) {
+    public Optional<Reading> getReadingForMonth(ReadingInMonthRequestDto rq) {
         return monitoringService.getReadingForMonth(rq);
     }
 

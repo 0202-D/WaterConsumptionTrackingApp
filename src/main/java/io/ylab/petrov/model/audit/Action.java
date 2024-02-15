@@ -3,8 +3,6 @@ package io.ylab.petrov.model.audit;
 
 import io.ylab.petrov.model.user.User;
 import lombok.*;
-import lombok.experimental.FieldDefaults;
-
 import java.time.LocalDateTime;
 
 @Data

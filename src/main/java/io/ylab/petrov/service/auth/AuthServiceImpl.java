@@ -4,100 +4,75 @@ import io.ylab.petrov.dao.audit.ActionRepository;
 import io.ylab.petrov.dao.audit.JdbcActionRepository;
 import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
-import io.ylab.petrov.dto.AuthReqDto;
+import io.ylab.petrov.dto.user.UserResponseDto;
+import io.ylab.petrov.dto.user.UserRequestDto;
+import io.ylab.petrov.exception.NotFoundException;
+import io.ylab.petrov.mapper.user.UserMapper;
+import io.ylab.petrov.mapper.user.UserMapperImpl;
 import io.ylab.petrov.model.audit.Action;
 import io.ylab.petrov.model.audit.Activity;
+import io.ylab.petrov.model.user.Role;
 import io.ylab.petrov.model.user.User;
-import io.ylab.petrov.utils.DataBaseConnector;
+import io.ylab.petrov.security.UserPrincipal;
+import lombok.RequiredArgsConstructor;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    private ActionRepository actionRepository;
-    private UserRepository userRepository;
+    private final ActionRepository actionRepository = new JdbcActionRepository();
+    private final UserRepository userRepository = new JdbcUserRepository();
+    private final UserMapper userMapper = new UserMapperImpl();
 
     @Override
-    public boolean userRegistration(User user) {
-        Connection connection = DataBaseConnector.getConnection();
-        try {
-            connection.setAutoCommit(false);
-            userRepository = new JdbcUserRepository();
-            actionRepository = new JdbcActionRepository();
-            Optional<User> searchUser = userRepository.getUserByUserName(user.getUserName());
-            if (searchUser.isPresent()) {
-                System.out.println("Пользователь с таким именем уже существует");
-                return false;
-            }
-            userRepository.addUser(user);
-            var actionUser = userRepository.getUserByUserName(user.getUserName())
-                    .orElseThrow(() -> new RuntimeException("Такого пользователя не существует"));
-            Action action = Action.builder()
-                    .user(actionUser)
-                    .activity(Activity.REGISTERED)
-                    .dateTime(LocalDateTime.now())
-                    .build();
-            actionRepository.addAction(action);
-            connection.commit();
-            return true;
-        } catch (SQLException e) {
-            if (connection != null) {
-                try {
-                    connection.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-            e.printStackTrace();
-            return false;
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.setAutoCommit(true);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+    public UserResponseDto userRegistration(User user) {
+        if (!checkExistUserByUserName(user.getUserName())) {
+            return null;
         }
+        user.setRole(Role.USER);
+        userRepository.addUser(user);
+        User dbUser = userRepository.getUserByUserName(user.getUserName())
+                .orElseThrow(() -> new NotFoundException("Пользователя с таким id не существует"));
+        Action action = Action.builder()
+                .user(dbUser)
+                .activity(Activity.REGISTERED)
+                .dateTime(LocalDateTime.now())
+                .build();
+        actionRepository.addAction(action);
+        return userMapper.toDtoRs(dbUser);
     }
 
     @Override
-    public Optional<User> authenticateUser(AuthReqDto user) {
-        Optional<User> searchUser = null;
-        Connection connection = DataBaseConnector.getConnection();
-        try {
-            connection.setAutoCommit(false);
-            userRepository = new JdbcUserRepository();
-            actionRepository = new JdbcActionRepository();
-            searchUser = userRepository.getUserByUserName(user.userName());
-            if (searchUser.isEmpty()) {
-                System.out.println("Пользователь с таким именем не существует");
-                return Optional.empty();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.setAutoCommit(true);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+    public UserResponseDto authenticateUser(UserRequestDto user) {
+        Optional<User> searchUser = userRepository.getUserByUserName(user.getUserName());
+        if (searchUser.isEmpty()) {
+            return null;
+        }
+        User dbUser = searchUser.get();
+        if (!dbUser.getPassword().equals(user.getPassword())) {
+            return null;
         }
         Action action = Action.builder()
-                .user(searchUser.get())
+                .user(dbUser)
                 .activity(Activity.ENTERED)
                 .dateTime(LocalDateTime.now())
                 .build();
         actionRepository.addAction(action);
-        return searchUser;
+        UserPrincipal userPrincipal = UserPrincipal.builder()
+                .userId(dbUser.getId())
+                .role(dbUser.getRole())
+                .build();
+        return userMapper.toDtoRs(dbUser);
     }
 
     @Override
     public Optional<User> getUserByUserName(String userName) {
         return userRepository.getUserByUserName(userName);
+    }
+
+    public boolean checkExistUserByUserName(String userName) {
+        Optional<User> dbUser = userRepository.getUserByUserName(userName);
+        return dbUser.isEmpty();
     }
 }

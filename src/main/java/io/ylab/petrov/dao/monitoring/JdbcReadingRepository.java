@@ -2,9 +2,9 @@ package io.ylab.petrov.dao.monitoring;
 
 import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
-import io.ylab.petrov.dto.ReadingInMonthRq;
-import io.ylab.petrov.dto.ReadingRqDto;
-import io.ylab.petrov.dto.ReadingRs;
+import io.ylab.petrov.dto.monitoring.ReadingInMonthRequestDto;
+import io.ylab.petrov.dto.monitoring.ReadingRequestDto;
+import io.ylab.petrov.dto.monitoring.ReadingResponseDto;
 import io.ylab.petrov.model.readout.Meter;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.model.user.User;
@@ -19,9 +19,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class JdbcReadingRepository implements ReadingRepository {
-    private UserRepository userRepository;
-
-    private MeterRepository meterRepository;
+    private UserRepository userRepository = new JdbcUserRepository();
+    private MeterRepository meterRepository = new JdbcMeterRepository();
 
     @Override
     public void addReading(Reading reading) {
@@ -40,15 +39,15 @@ public class JdbcReadingRepository implements ReadingRepository {
     }
 
     @Override
-    public Optional<ReadingRs> getCurrentReading(ReadingRqDto dto) {
+    public Optional<ReadingResponseDto> getCurrentReading(ReadingRequestDto dto) {
         String query = "SELECT * FROM domain.reading WHERE user_id = ? AND meter_id = ? AND is_current =true ";
         try (Connection connection = HikariCPDataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, dto.userId());
-            statement.setLong(2, dto.meterId());
+            statement.setLong(1, dto.getUserId());
+            statement.setLong(2, dto.getMeterId());
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    ReadingRs reading = ReadingRs.builder()
+                    ReadingResponseDto reading = ReadingResponseDto.builder()
                             .reading(resultSet.getBigDecimal("meter_reading"))
                             .date(resultSet.getDate("date").toLocalDate())
                             .build();
@@ -64,7 +63,7 @@ public class JdbcReadingRepository implements ReadingRepository {
     }
 
     @Override
-    public Optional<Reading> getReadingForMonth(ReadingInMonthRq rq) {
+    public Optional<Reading> getReadingForMonth(ReadingInMonthRequestDto rq) {
         userRepository = new JdbcUserRepository();
         meterRepository = new JdbcMeterRepository();
         String query = "SELECT * FROM domain.reading WHERE user_id = ? AND meter_id = ? AND EXTRACT(MONTH FROM date) = ?";
@@ -128,9 +127,8 @@ public class JdbcReadingRepository implements ReadingRepository {
     @Override
     public void save(Reading reading) {
         String query = "UPDATE domain.reading set is_current=false where id=" + reading.getId();
-        try {
-            Connection connection = HikariCPDataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
+        try (Connection connection = HikariCPDataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
