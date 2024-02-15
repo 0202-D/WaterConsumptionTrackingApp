@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ReadingRsDto {
+public class ReadingResponseDto {
     private BigDecimal reading;
     private LocalDate date;
 }

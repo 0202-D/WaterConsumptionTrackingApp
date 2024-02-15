@@ -7,5 +7,5 @@ import lombok.Builder;
  */
 import java.math.BigDecimal;
 @Builder
-public record AddReadingRqDto(@NotBlank long userId, @NotBlank BigDecimal readout, @NotBlank long meterId) {
+public record AddReadingRequestDto(@NotBlank long userId, @NotBlank BigDecimal readout, @NotBlank long meterId) {
 }

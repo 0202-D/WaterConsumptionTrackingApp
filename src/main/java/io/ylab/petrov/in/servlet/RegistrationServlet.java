@@ -8,8 +8,8 @@ import io.ylab.petrov.dao.audit.ActionRepository;
 import io.ylab.petrov.dao.audit.JdbcActionRepository;
 import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
-import io.ylab.petrov.dto.user.UserRsDto;
-import io.ylab.petrov.dto.user.UserRqDto;
+import io.ylab.petrov.dto.user.UserResponseDto;
+import io.ylab.petrov.dto.user.UserRequestDto;
 import io.ylab.petrov.exception.ExceptionJson;
 import io.ylab.petrov.in.controller.AuthController;
 import io.ylab.petrov.mapper.user.UserMapper;
@@ -72,10 +72,10 @@ public class RegistrationServlet extends HttpServlet {
         resp.setContentType(APPLICATION_JSON);
         final Gson gson = new Gson();
         var body = req.getReader();
-        final var userDto = gson.fromJson(body, UserRqDto.class);
-        Set<ConstraintViolation<UserRqDto>> violations = validator.validate(userDto);
+        final var userDto = gson.fromJson(body, UserRequestDto.class);
+        Set<ConstraintViolation<UserRequestDto>> violations = validator.validate(userDto);
         if (!violations.isEmpty()) {
-            for (ConstraintViolation<UserRqDto> violation : violations) {
+            for (ConstraintViolation<UserRequestDto> violation : violations) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 ExceptionJson exceptionJson = ExceptionJson.builder()
                         .message(violation.getMessage())
@@ -86,11 +86,11 @@ public class RegistrationServlet extends HttpServlet {
             }
         } else {
             User user = mapper.toEntity(userDto);
-            UserRsDto userRsDto = authController.addUser(user);
-            if (userRsDto != null) {
+            UserResponseDto userResponseDto = authController.addUser(user);
+            if (userResponseDto != null) {
                 resp.setStatus(HttpServletResponse.SC_OK);
                 resp.setContentType(APPLICATION_JSON);
-                resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(userRsDto));
+                resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(userResponseDto));
             } else {
                 ExceptionJson exceptionJson = ExceptionJson.builder()
                         .message(BAD_REQUEST_MESSAGE)

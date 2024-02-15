@@ -1,8 +1,8 @@
 package io.ylab.petrov.dao.monitoring;
 
-import io.ylab.petrov.dto.monitoring.ReadingInMonthRqDto;
-import io.ylab.petrov.dto.monitoring.ReadingRqDto;
-import io.ylab.petrov.dto.monitoring.ReadingRsDto;
+import io.ylab.petrov.dto.monitoring.ReadingInMonthRequestDto;
+import io.ylab.petrov.dto.monitoring.ReadingRequestDto;
+import io.ylab.petrov.dto.monitoring.ReadingResponseDto;
 import io.ylab.petrov.model.readout.Reading;
 
 import java.util.List;
@@ -11,9 +11,9 @@ import java.util.Optional;
 public interface ReadingRepository {
     void addReading(Reading reading);
 
-    Optional<ReadingRsDto> getCurrentReading(ReadingRqDto dto);
+    Optional<ReadingResponseDto> getCurrentReading(ReadingRequestDto dto);
 
-    Optional<Reading> getReadingForMonth(ReadingInMonthRqDto rq);
+    Optional<Reading> getReadingForMonth(ReadingInMonthRequestDto rq);
 
     List<Reading> historyReadingsByUserId(long id);
 

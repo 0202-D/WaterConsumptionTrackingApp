@@ -1,7 +1,7 @@
 package servlet;
 
-import io.ylab.petrov.dto.user.UserRsDto;
-import io.ylab.petrov.dto.user.UserRqDto;
+import io.ylab.petrov.dto.user.UserResponseDto;
+import io.ylab.petrov.dto.user.UserRequestDto;
 import io.ylab.petrov.in.controller.AuthController;
 import io.ylab.petrov.in.servlet.RegistrationServlet;
 import io.ylab.petrov.model.user.Role;
@@ -28,14 +28,14 @@ class RegistrationServletTest {
         ServletOutputStream outputStreamMock = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outputStreamMock);
         Validator mockedValidator = mock(Validator.class);
-        when(mockedValidator.validate(any(UserRqDto.class)))
+        when(mockedValidator.validate(any(UserRequestDto.class)))
                 .thenReturn(new HashSet<>());
         String requestBody = "{\"userName\": \"testUser\", \"password\": \"testPassword\"}";
         when(request.getReader()).thenReturn(new BufferedReader(new StringReader(requestBody)));
-        UserRsDto expectedUserRsDto = new UserRsDto(1, "testUser", Role.USER);
+        UserResponseDto expectedUserResponseDto = new UserResponseDto(1L, "testUser", Role.USER);
         AuthController authControllerMock = mock(AuthController.class);
         when(authControllerMock.addUser(new User(null, "testUser", "testPassword", Role.USER)))
-                .thenReturn(expectedUserRsDto);
+                .thenReturn(expectedUserResponseDto);
         RegistrationServlet registrationServlet = new RegistrationServlet();
         registrationServlet.setValidator(mockedValidator);
         registrationServlet.doPost(request, response);

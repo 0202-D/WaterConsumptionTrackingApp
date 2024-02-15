@@ -8,6 +8,6 @@ import java.time.Month;
  * dto запроса на просмотр показаний за месяц
  */
 @Builder
-public record ReadingInMonthRqDto(@NotBlank long userId, @NotBlank long meterId, @NotBlank Month month) {
+public record ReadingInMonthRequestDto(@NotBlank long userId, @NotBlank long meterId, @NotBlank Month month) {
 
 }

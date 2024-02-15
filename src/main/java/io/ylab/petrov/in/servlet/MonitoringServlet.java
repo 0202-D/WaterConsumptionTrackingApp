@@ -8,10 +8,10 @@ import io.ylab.petrov.dao.audit.ActionRepository;
 import io.ylab.petrov.dao.audit.JdbcActionRepository;
 import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
-import io.ylab.petrov.dto.monitoring.AddReadingRqDto;
-import io.ylab.petrov.dto.monitoring.ReadingInMonthRqDto;
-import io.ylab.petrov.dto.monitoring.ReadingRqDto;
-import io.ylab.petrov.dto.monitoring.ReadingRsDto;
+import io.ylab.petrov.dto.monitoring.AddReadingRequestDto;
+import io.ylab.petrov.dto.monitoring.ReadingInMonthRequestDto;
+import io.ylab.petrov.dto.monitoring.ReadingRequestDto;
+import io.ylab.petrov.dto.monitoring.ReadingResponseDto;
 import io.ylab.petrov.exception.ExceptionJson;
 import io.ylab.petrov.exception.NotFoundException;
 import io.ylab.petrov.in.controller.MonitoringController;
@@ -81,14 +81,14 @@ public class MonitoringServlet extends HttpServlet {
                 resp.setContentType(APPLICATION_JSON);
                 final Gson gson = new Gson();
                 var body = req.getReader();
-                final var readingRqDto = gson.fromJson(body, ReadingRqDto.class);
+                final var readingRqDto = gson.fromJson(body, ReadingRequestDto.class);
                 User userPrincipal = getUserPrincipal(req);
                 if (userPrincipal.getId() != readingRqDto.getUserId() && userPrincipal.getRole() != Role.ADMIN) {
                     returnForbiddenResponse(resp);
                     return;
                 }
-                ReadingRsDto readingRsDto = monitoringController.getCurrentReading(readingRqDto);
-                if (readingRsDto == null) {
+                ReadingResponseDto readingResponseDto = monitoringController.getCurrentReading(readingRqDto);
+                if (readingResponseDto == null) {
                     ExceptionJson exceptionJson = ExceptionJson.builder()
                             .message(NOT_FOUND)
                             .httpResponse(HttpServletResponse.SC_NOT_FOUND)
@@ -99,7 +99,7 @@ public class MonitoringServlet extends HttpServlet {
                 } else {
                     resp.setStatus(HttpServletResponse.SC_OK);
                     resp.setContentType(APPLICATION_JSON);
-                    resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(readingRsDto));
+                    resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(readingResponseDto));
                 }
             } else if (requestURI.contains("/user/history/")) {
                 User userPrincipal = getUserPrincipal(req);
@@ -125,7 +125,7 @@ public class MonitoringServlet extends HttpServlet {
             } else if (requestURI.contains("/user/month")) {
                 final Gson gson = new Gson();
                 var body = req.getReader();
-                final var readingInMouth = gson.fromJson(body, ReadingInMonthRqDto.class);
+                final var readingInMouth = gson.fromJson(body, ReadingInMonthRequestDto.class);
                 User userPrincipal = getUserPrincipal(req);
                 if (userPrincipal.getId() != readingInMouth.userId() && userPrincipal.getRole() != Role.ADMIN) {
                     returnForbiddenResponse(resp);
@@ -149,10 +149,10 @@ public class MonitoringServlet extends HttpServlet {
                 resp.setContentType(APPLICATION_JSON);
                 final var gson = new Gson();
                 var body = req.getReader();
-                final var addReadingRqDto = gson.fromJson(body, AddReadingRqDto.class);
-                Set<ConstraintViolation<AddReadingRqDto>> violations = validator.validate(addReadingRqDto);
+                final var addReadingRqDto = gson.fromJson(body, AddReadingRequestDto.class);
+                Set<ConstraintViolation<AddReadingRequestDto>> violations = validator.validate(addReadingRqDto);
                 if (!violations.isEmpty()) {
-                    for (ConstraintViolation<AddReadingRqDto> violation : violations) {
+                    for (ConstraintViolation<AddReadingRequestDto> violation : violations) {
                         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                         ExceptionJson exceptionJson = ExceptionJson.builder()
                                 .message(violation.getMessage())

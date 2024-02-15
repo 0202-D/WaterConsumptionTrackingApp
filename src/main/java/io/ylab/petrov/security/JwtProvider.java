@@ -2,7 +2,7 @@ package io.ylab.petrov.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.lang.Assert;
-import io.ylab.petrov.dto.user.UserRsDto;
+import io.ylab.petrov.dto.user.UserResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ public class JwtProvider {
         return secretKey;
     }
     //сгенерировать токен JWT (Access Token)
-    public String generateAccessJwtToken(UserRsDto userPrincipal) {
+    public String generateAccessJwtToken(UserResponseDto userPrincipal) {
         return Jwts.builder()
                 .setSubject((userPrincipal.getUserName()))
                 .setId(String.valueOf(userPrincipal.getUserId()))

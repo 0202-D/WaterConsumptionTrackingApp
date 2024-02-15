@@ -7,19 +7,16 @@ import io.ylab.petrov.dao.audit.JdbcActionRepository;
 import io.ylab.petrov.dao.monitoring.*;
 import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
-import io.ylab.petrov.dto.monitoring.AddReadingRqDto;
-import io.ylab.petrov.dto.monitoring.ReadingInMonthRqDto;
-import io.ylab.petrov.dto.monitoring.ReadingRqDto;
-import io.ylab.petrov.dto.monitoring.ReadingRsDto;
-import io.ylab.petrov.model.audit.Action;
-import io.ylab.petrov.model.audit.Activity;
+import io.ylab.petrov.dto.monitoring.AddReadingRequestDto;
+import io.ylab.petrov.dto.monitoring.ReadingInMonthRequestDto;
+import io.ylab.petrov.dto.monitoring.ReadingRequestDto;
+import io.ylab.petrov.dto.monitoring.ReadingResponseDto;
 import io.ylab.petrov.model.readout.Meter;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.model.user.User;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,14 +28,14 @@ public class MonitoringServiceImpl implements MonitoringService {
 
     @Override
     @Loggable
-    public Optional<ReadingRsDto> getCurrentReading(ReadingRqDto dto) {
+    public Optional<ReadingResponseDto> getCurrentReading(ReadingRequestDto dto) {
         User user = userRepository.getUserById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
         return readingRepository.getCurrentReading(dto);
     }
 
     @Override
-    public Optional<Reading> getReadingForMonth(ReadingInMonthRqDto rq) {
+    public Optional<Reading> getReadingForMonth(ReadingInMonthRequestDto rq) {
         User user = userRepository.getUserById(rq.userId())
                 .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
         return readingRepository.getReadingForMonth(rq);
@@ -52,7 +49,7 @@ public class MonitoringServiceImpl implements MonitoringService {
     }
 
     @Override
-    public boolean addReading(AddReadingRqDto dto) {
+    public boolean addReading(AddReadingRequestDto dto) {
             User user = getUserById(dto.userId());
             Meter meter = getMeterById(dto.meterId());
             checkIfAlreadySubmittedForMonth(dto.userId(), dto.meterId());
@@ -71,24 +68,24 @@ public class MonitoringServiceImpl implements MonitoringService {
     }
 
     private void checkIfAlreadySubmittedForMonth(long userId, long meterId) {
-        ReadingRqDto currentReadingDto = ReadingRqDto.builder()
+        ReadingRequestDto currentReadingDto = ReadingRequestDto.builder()
                 .userId(userId)
                 .meterId(meterId)
                 .build();
-        Optional<ReadingRsDto> currentReading = readingRepository.getCurrentReading(currentReadingDto);
+        Optional<ReadingResponseDto> currentReading = readingRepository.getCurrentReading(currentReadingDto);
         if (currentReading.isPresent() && currentReading.get().getDate().getMonth() == LocalDate.now().getMonth()) {
             throw new RuntimeException("За этот месяц Вы уже сдавали показания");
         }
     }
 
     private void updatePreviousReading(long userId, long meterId) {
-        ReadingRqDto currentReadingDto = ReadingRqDto.builder()
+        ReadingRequestDto currentReadingDto = ReadingRequestDto.builder()
                 .userId(userId)
                 .meterId(meterId)
                 .build();
-        Optional<ReadingRsDto> currentReading = readingRepository.getCurrentReading(currentReadingDto);
+        Optional<ReadingResponseDto> currentReading = readingRepository.getCurrentReading(currentReadingDto);
         if (currentReading.isPresent()) {
-            ReadingInMonthRqDto rq = ReadingInMonthRqDto.builder()
+            ReadingInMonthRequestDto rq = ReadingInMonthRequestDto.builder()
                     .userId(userId)
                     .meterId(meterId)
                     .month(currentReading.get().getDate().getMonth())

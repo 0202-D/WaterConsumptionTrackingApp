@@ -8,8 +8,8 @@ import io.ylab.petrov.dao.audit.ActionRepository;
 import io.ylab.petrov.dao.audit.JdbcActionRepository;
 import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
-import io.ylab.petrov.dto.user.UserRsDto;
-import io.ylab.petrov.dto.user.UserRqDto;
+import io.ylab.petrov.dto.user.UserResponseDto;
+import io.ylab.petrov.dto.user.UserRequestDto;
 import io.ylab.petrov.exception.ExceptionJson;
 import io.ylab.petrov.in.controller.AuthController;
 import io.ylab.petrov.security.JwtProvider;
@@ -68,10 +68,10 @@ public class AuthServlet extends HttpServlet {
         resp.setContentType(APPLICATION_JSON);
         final var gson = new Gson();
         var body = req.getReader();
-        UserRqDto userDto = gson.fromJson(body, UserRqDto.class);
-        Set<ConstraintViolation<UserRqDto>> violations = validator.validate(userDto);
+        UserRequestDto userDto = gson.fromJson(body, UserRequestDto.class);
+        Set<ConstraintViolation<UserRequestDto>> violations = validator.validate(userDto);
         if (!violations.isEmpty()) {
-            for (ConstraintViolation<UserRqDto> violation : violations) {
+            for (ConstraintViolation<UserRequestDto> violation : violations) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 ExceptionJson exceptionJson = ExceptionJson.builder()
                         .message(violation.getMessage())
@@ -81,13 +81,13 @@ public class AuthServlet extends HttpServlet {
                 resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(exceptionJson));
             }
         } else {
-            UserRsDto userRsDto = authController.authenticateUser(userDto);
-            if (userRsDto != null) {
-                String token = jwtProvider.generateAccessJwtToken(userRsDto);
+            UserResponseDto userResponseDto = authController.authenticateUser(userDto);
+            if (userResponseDto != null) {
+                String token = jwtProvider.generateAccessJwtToken(userResponseDto);
                 resp.setStatus(HttpServletResponse.SC_OK);
                 resp.setContentType(APPLICATION_JSON);
                 resp.addHeader("Authorization", "Bearer " + token);
-                resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(userRsDto));
+                resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(userResponseDto));
             } else {
                 ExceptionJson exceptionJson = ExceptionJson.builder()
                         .message(NOT_FOUND)

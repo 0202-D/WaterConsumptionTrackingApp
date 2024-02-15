@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 /**
  * dto запроса на регистрацию и аутентификацию пользователя
  */
-public class UserRqDto {
+public class UserRequestDto {
     /**
      * имя пользователя
      */

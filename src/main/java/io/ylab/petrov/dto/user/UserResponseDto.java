@@ -13,11 +13,11 @@ import lombok.NoArgsConstructor;
 /**
  * dto ответа на регистрацию и аутентификацию пользователя
  */
-public class UserRsDto {
+public class UserResponseDto {
     /**
      * идентификатор пользователя
      */
-    private long userId;
+    private Long userId;
     /**
      * имя пользователя
      */

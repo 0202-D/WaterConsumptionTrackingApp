@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReadingRqDto {
+public class ReadingRequestDto {
     @NotBlank private long userId;
     @NotBlank private long meterId;
 }

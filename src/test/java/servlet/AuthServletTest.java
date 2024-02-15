@@ -1,8 +1,8 @@
 package servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.ylab.petrov.dto.user.UserRsDto;
-import io.ylab.petrov.dto.user.UserRqDto;
+import io.ylab.petrov.dto.user.UserResponseDto;
+import io.ylab.petrov.dto.user.UserRequestDto;
 import io.ylab.petrov.in.servlet.AuthServlet;
 import io.ylab.petrov.model.user.Role;
 import io.ylab.petrov.security.JwtProvider;
@@ -32,16 +32,16 @@ class AuthServletTest {
         ServletOutputStream outputStreamMock = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outputStreamMock);
         Validator mockedValidator = mock(Validator.class);
-        when(mockedValidator.validate(any(UserRqDto.class)))
+        when(mockedValidator.validate(any(UserRequestDto.class)))
                 .thenReturn(new HashSet<>());
         String requestBody = "{\"userName\": \"user\", \"password\": \"user\"}";
         when(request.getReader()).thenReturn(new BufferedReader(new StringReader(requestBody)));
-        UserRsDto expectedUserRsDto = new UserRsDto(1, "testUser", Role.USER);
+        UserResponseDto expectedUserResponseDto = new UserResponseDto(1L, "testUser", Role.USER);
         String expectedToken = "testToken";
         AuthService authServiceMock = mock(AuthService.class);
-        when(authServiceMock.authenticateUser(any(UserRqDto.class))).thenReturn(expectedUserRsDto);
+        when(authServiceMock.authenticateUser(any(UserRequestDto.class))).thenReturn(expectedUserResponseDto);
         JwtProvider jwtProviderMock = mock(JwtProvider.class);
-        when(jwtProviderMock.generateAccessJwtToken(expectedUserRsDto)).thenReturn(expectedToken);
+        when(jwtProviderMock.generateAccessJwtToken(expectedUserResponseDto)).thenReturn(expectedToken);
         AuthServlet authServlet = new AuthServlet();
         authServlet.setValidator(mockedValidator);
         authServlet.doPost(request, response);
@@ -57,16 +57,16 @@ class AuthServletTest {
         ServletOutputStream outputStreamMock = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outputStreamMock);
         Validator mockedValidator = mock(Validator.class);
-        when(mockedValidator.validate(any(UserRqDto.class)))
+        when(mockedValidator.validate(any(UserRequestDto.class)))
                 .thenReturn(new HashSet<>());
         String requestBody = "{\"userName\": \"user2\", \"password\": \"user\"}";
         when(request.getReader()).thenReturn(new BufferedReader(new StringReader(requestBody)));
-        UserRsDto expectedUserRsDto = new UserRsDto(1, "testUser", Role.USER);
+        UserResponseDto expectedUserResponseDto = new UserResponseDto(1L, "testUser", Role.USER);
         String expectedToken = "testToken";
         AuthService authServiceMock = mock(AuthService.class);
-        when(authServiceMock.authenticateUser(any(UserRqDto.class))).thenReturn(expectedUserRsDto);
+        when(authServiceMock.authenticateUser(any(UserRequestDto.class))).thenReturn(expectedUserResponseDto);
         JwtProvider jwtProviderMock = mock(JwtProvider.class);
-        when(jwtProviderMock.generateAccessJwtToken(expectedUserRsDto)).thenReturn(expectedToken);
+        when(jwtProviderMock.generateAccessJwtToken(expectedUserResponseDto)).thenReturn(expectedToken);
         AuthServlet authServlet = new AuthServlet();
         authServlet.setValidator(mockedValidator);
         authServlet.doPost(request, response);
