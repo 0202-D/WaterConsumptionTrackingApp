@@ -6,15 +6,17 @@ import io.ylab.petrov.model.audit.Action;
 import io.ylab.petrov.model.audit.Activity;
 import io.ylab.petrov.model.user.User;
 import io.ylab.petrov.utils.HikariCPDataSource;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 @Repository
+@RequiredArgsConstructor
 public class JdbcActionRepository implements ActionRepository {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void addAction(Action action) {
@@ -32,7 +34,6 @@ public class JdbcActionRepository implements ActionRepository {
 
     @Override
     public List<Action> getAllByUserName(String userName) {
-        userRepository = new JdbcUserRepository();
         String query = "SELECT * FROM domain.action " +
                 "INNER JOIN users ON actions.user_id = users.id " +
                 "WHERE users.user_name = ?";

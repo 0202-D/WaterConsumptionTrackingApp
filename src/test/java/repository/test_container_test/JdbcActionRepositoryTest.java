@@ -1,6 +1,7 @@
 package repository.test_container_test;
 
 import io.ylab.petrov.dao.audit.JdbcActionRepository;
+import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.model.audit.Action;
 import io.ylab.petrov.model.user.Role;
 import org.junit.jupiter.api.AfterAll;
@@ -72,7 +73,8 @@ public class JdbcActionRepositoryTest {
 
     @Test
     void testAddAction() throws SQLException {
-        JdbcActionRepository actionRepository = new JdbcActionRepository();
+        JdbcUserRepository jdbcUserRepository = new JdbcUserRepository();
+        JdbcActionRepository actionRepository = new JdbcActionRepository(jdbcUserRepository);
         Action action = Utils.getAction();
         Action action2 = Utils.getActionExited();
         actionRepository.addAction(action);

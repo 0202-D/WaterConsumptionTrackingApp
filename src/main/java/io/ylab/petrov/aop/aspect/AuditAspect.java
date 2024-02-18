@@ -7,6 +7,7 @@ import io.ylab.petrov.dto.monitoring.ReadingInMonthRequestDto;
 import io.ylab.petrov.dto.monitoring.ReadingRequestDto;
 import io.ylab.petrov.model.audit.Action;
 import io.ylab.petrov.model.audit.Activity;
+import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
@@ -20,8 +21,9 @@ import java.time.LocalDateTime;
  */
 @Aspect
 @Component
+@RequiredArgsConstructor
 public class AuditAspect {
-    private final ActionRepository actionRepository = new JdbcActionRepository();
+    private final ActionRepository actionRepository;
     /**
      * Регистрирует запрошенное действие для операции получения текущих показаний.
      * @param dto Объект запроса, содержащий идентификатор пользователя.
