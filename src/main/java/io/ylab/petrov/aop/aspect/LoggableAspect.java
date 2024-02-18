@@ -7,8 +7,10 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.stereotype.Component;
 
 @Aspect
+@Component
 public class LoggableAspect {
     private static final Logger logger = LogManager.getLogger(LoggableAspect.class);
     @Pointcut("within(@io.ylab.petrov.aop.annotation.Loggable *) && execution(* *(..))")

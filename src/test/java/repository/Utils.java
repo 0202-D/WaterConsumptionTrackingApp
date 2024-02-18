@@ -1,5 +1,6 @@
 package repository;
 
+import io.ylab.petrov.dto.user.UserRequestDto;
 import io.ylab.petrov.model.audit.Action;
 import io.ylab.petrov.model.audit.Activity;
 import io.ylab.petrov.model.user.Role;
@@ -16,6 +17,7 @@ public class Utils {
                 .role(Role.USER)
                 .build();
     }
+
     public static User getSecondUser() {
         return User.builder()
                 .id(1L)
@@ -24,18 +26,27 @@ public class Utils {
                 .role(Role.USER)
                 .build();
     }
+
     public static Action getAction() {
         return Action.builder()
-                .user(getUser())
+                .userId(1L)
                 .activity(Activity.ENTERED)
                 .dateTime(LocalDateTime.now())
                 .build();
     }
+
     public static Action getActionExited() {
         return Action.builder()
-                .user(getSecondUser())
+                .userId(2L)
                 .activity(Activity.EXITED)
                 .dateTime(LocalDateTime.now())
+                .build();
+    }
+
+    public static UserRequestDto getUserRequestDto() {
+        return UserRequestDto.builder()
+                .userName("user")
+                .password("user")
                 .build();
     }
 }

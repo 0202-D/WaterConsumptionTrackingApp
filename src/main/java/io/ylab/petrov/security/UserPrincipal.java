@@ -3,6 +3,7 @@ package io.ylab.petrov.security;
 import io.ylab.petrov.model.user.Role;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 import java.security.Principal;
 @Builder

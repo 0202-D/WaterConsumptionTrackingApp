@@ -1,8 +1,11 @@
 package io.ylab.petrov.model.audit;
 
+import org.springframework.stereotype.Component;
+
 /**
  * Перечисления активности.
  */
+
 public enum Activity {
     /**
      * Пользователь зашел

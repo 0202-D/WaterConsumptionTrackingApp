@@ -5,11 +5,11 @@
     <changeSet id="create-schema-domain" author="petrov" runOnChange="true">
         <sql>CREATE SCHEMA IF NOT EXISTS domain;</sql>
         <createTable tableName="users" schemaName="domain" >
-            <column name="id" type="bigint" autoIncrement="true">
+            <column name="id" type="serial">
                 <constraints primaryKey="true" nullable="false" unique="true"/>
             </column>
             <column name="user_name" type="varchar(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" unique="true"/>
             </column>
             <column name="password" type="varchar(255)">
                 <constraints nullable="false"/>
@@ -19,7 +19,7 @@
             </column>
         </createTable>
         <createTable tableName="meter" schemaName="domain">
-            <column name="id" type="bigint" autoIncrement="true">
+            <column name="id" type="serial">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="varchar(255)">
@@ -27,7 +27,7 @@
             </column>
         </createTable>
         <createTable tableName="activity" schemaName="domain">
-            <column name="id" type="bigint" autoIncrement="true">
+            <column name="id" type="serial">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="varchar(255)">
@@ -45,7 +45,7 @@
             </column>
         </createTable>
         <createTable tableName="reading" schemaName="domain">
-            <column name="id" type="bigint" autoIncrement="true">
+            <column name="id" type="serial">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="user_id" type="bigint">

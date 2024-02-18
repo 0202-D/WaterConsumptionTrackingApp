@@ -6,11 +6,12 @@ import io.ylab.petrov.model.audit.Action;
 import io.ylab.petrov.model.audit.Activity;
 import io.ylab.petrov.model.user.User;
 import io.ylab.petrov.utils.HikariCPDataSource;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
+@Repository
 public class JdbcActionRepository implements ActionRepository {
 
     private UserRepository userRepository;
@@ -20,7 +21,7 @@ public class JdbcActionRepository implements ActionRepository {
         String query = "INSERT INTO domain.action (user_id, activity, date_time) VALUES (?, ?, ?)";
         try (Connection connection = HikariCPDataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, action.getUser().getId());
+            statement.setLong(1, action.getUserId());
             statement.setString(2, action.getActivity().toString());
             statement.setTimestamp(3, Timestamp.valueOf(action.getDateTime()));
             statement.executeUpdate();
@@ -44,7 +45,7 @@ public class JdbcActionRepository implements ActionRepository {
                         .orElseThrow(() -> new RuntimeException("Пльзователя с таким id не существует"));
                 while (resultSet.next()) {
                     Action action = Action.builder()
-                            .user(user)
+                            .userId(user.getId())
                             .dateTime(resultSet.getTimestamp("date").toLocalDateTime())
                             .activity(Activity.valueOf(resultSet.getString("activity")))
                             .build();

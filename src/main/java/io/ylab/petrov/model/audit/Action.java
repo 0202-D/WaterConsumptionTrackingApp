@@ -3,11 +3,13 @@ package io.ylab.petrov.model.audit;
 
 import io.ylab.petrov.model.user.User;
 import lombok.*;
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Builder
 /**
  * Класс, описывающий действие пользователя в системе.
@@ -16,7 +18,7 @@ public class Action {
     /**
      * Объект пользователя, выполнившего действие.
      */
-    private User user;
+    private Long userId;
     /**
      * Тип действия пользователя.
      */

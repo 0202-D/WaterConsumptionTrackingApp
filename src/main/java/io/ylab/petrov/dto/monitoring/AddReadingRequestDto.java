@@ -1,11 +1,24 @@
 package io.ylab.petrov.dto.monitoring;
 
-import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 /**
  * dto запроса на добавления показаний
  */
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+
 @Builder
-public record AddReadingRequestDto(@NotBlank long userId, @NotBlank BigDecimal readout, @NotBlank long meterId) {
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class AddReadingRequestDto {
+    @NotNull
+    private Long userId;
+    @NotNull
+    private BigDecimal readout;
+    @NotNull
+    private Long meterId;
 }

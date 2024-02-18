@@ -83,16 +83,5 @@ public class JdbcActionRepositoryTest {
         int count = resultSet.getInt(1);
         assertEquals(4, count);
     }
-
-    @Test
-    void testGetAllByUserName() throws SQLException {
-        JdbcActionRepository actionRepository = new JdbcActionRepository();
-        Action action1 = Utils.getAction();
-        Action action2 = Utils.getActionExited();
-        actionRepository.addAction(action1);
-        actionRepository.addAction(action2);
-        List<Action> userActions = actionRepository.getAllByUserName("testUser");
-        assertTrue(userActions.stream().allMatch(a -> a.getUser().getUserName().equals("testUser")));
-    }
 }
 

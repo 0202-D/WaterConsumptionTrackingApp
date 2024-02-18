@@ -1,10 +1,13 @@
 package io.ylab.petrov.dto.monitoring;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 /**
  * dto запроса на просмотр текущих показаний
  */
@@ -13,6 +16,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReadingRequestDto {
-    @NotBlank private long userId;
-    @NotBlank private long meterId;
+    @NotNull
+    private long userId;
+    @NotNull
+    private long meterId;
 }

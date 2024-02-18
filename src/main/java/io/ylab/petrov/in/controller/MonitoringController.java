@@ -6,30 +6,41 @@ import io.ylab.petrov.dto.monitoring.ReadingRequestDto;
 import io.ylab.petrov.dto.monitoring.ReadingResponseDto;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.service.monitoring.MonitoringService;
-import io.ylab.petrov.service.monitoring.MonitoringServiceImpl;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
 @Data
+@RequiredArgsConstructor
+@RestController
 public class MonitoringController {
-    private final MonitoringService monitoringService = new MonitoringServiceImpl();
+    private final MonitoringService monitoringService;
 
-    public boolean addReading(AddReadingRequestDto dto) {
-        return monitoringService.addReading(dto);
+    @PostMapping("/add")
+    public ResponseEntity addReading(@RequestBody @Valid AddReadingRequestDto dto) {
+        monitoringService.addReading(dto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    public ReadingResponseDto getCurrentReading(ReadingRequestDto dto) {
+    @PostMapping("/getcurrent")
+    public ReadingResponseDto getCurrentReading(@RequestBody @Valid ReadingRequestDto dto) {
         Optional<ReadingResponseDto> reading = monitoringService.getCurrentReading(dto);
         return reading.orElse(null);
     }
 
-    public Optional<Reading> getReadingForMonth(ReadingInMonthRequestDto rq) {
+    @PostMapping("/getbymonth")
+    public Optional<Reading> getReadingForMonth(@RequestBody @Valid ReadingInMonthRequestDto rq) {
         return monitoringService.getReadingForMonth(rq);
     }
 
-    public List<Reading>historyReadingsByUserId(long userId){
+    @GetMapping("/history/{userId}")
+    public List<Reading> historyReadingsByUserId(@PathVariable("userId") long userId) {
         return monitoringService.historyReadingsByUserId(userId);
     }
 }

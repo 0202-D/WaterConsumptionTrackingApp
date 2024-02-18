@@ -9,6 +9,7 @@ import io.ylab.petrov.model.readout.Meter;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.model.user.User;
 import io.ylab.petrov.utils.HikariCPDataSource;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,7 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+@Repository
 public class JdbcReadingRepository implements ReadingRepository {
     private UserRepository userRepository = new JdbcUserRepository();
     private MeterRepository meterRepository = new JdbcMeterRepository();

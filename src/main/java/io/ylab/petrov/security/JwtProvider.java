@@ -3,16 +3,17 @@ package io.ylab.petrov.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.lang.Assert;
 import io.ylab.petrov.dto.user.UserResponseDto;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
-
+@Component
 public class JwtProvider {
     private static final byte [] SECRET_KEY = "mckkjnnhT53=pcntUUtwb34Zzhhenfn".getBytes(StandardCharsets.UTF_8);
     private static final Logger logger = LoggerFactory.getLogger(JwtProvider.class);

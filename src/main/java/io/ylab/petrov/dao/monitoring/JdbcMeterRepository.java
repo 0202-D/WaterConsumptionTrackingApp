@@ -2,12 +2,13 @@ package io.ylab.petrov.dao.monitoring;
 
 import io.ylab.petrov.model.readout.Meter;
 import io.ylab.petrov.utils.HikariCPDataSource;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
+@Repository
 public class JdbcMeterRepository implements MeterRepository {
     @Override
     public Meter getMeterById(long id) {

@@ -1,11 +1,12 @@
 package io.ylab.petrov.mapper.user;
 
-
-import io.ylab.petrov.dto.user.UserResponseDto;
 import io.ylab.petrov.dto.user.UserRequestDto;
+import io.ylab.petrov.dto.user.UserResponseDto;
 import io.ylab.petrov.model.user.User;
+import org.springframework.stereotype.Component;
 
-public class UserMapperImpl implements UserMapper {
+@Component
+public class UserMapperImpl implements UserMapper{
     @Override
     public UserResponseDto toDtoRs(User user) {
         return UserResponseDto.builder()
@@ -14,7 +15,6 @@ public class UserMapperImpl implements UserMapper {
                 .role(user.getRole())
                 .build();
     }
-
 
     @Override
     public User toEntity(UserRequestDto userDto) {
