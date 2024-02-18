@@ -17,7 +17,9 @@ import java.util.stream.Collectors;
 
 import static io.ylab.petrov.exception.ErrorCodes.*;
 
-
+/**
+ Глобальный обработчик исключений для контроллеров.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 

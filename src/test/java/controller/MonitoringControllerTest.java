@@ -6,10 +6,8 @@ import io.ylab.petrov.dto.monitoring.ReadingInMonthRequestDto;
 import io.ylab.petrov.dto.monitoring.ReadingRequestDto;
 import io.ylab.petrov.dto.monitoring.ReadingResponseDto;
 import io.ylab.petrov.in.controller.MonitoringController;
-import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.service.monitoring.MonitoringService;
 import org.junit.Before;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -22,14 +20,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import repository.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @RunWith(MockitoJUnitRunner.class)
 class MonitoringControllerTest {
     @Mock
@@ -70,8 +67,8 @@ class MonitoringControllerTest {
 
     @Test
     @DisplayName("тест получения показаний за месяц")
-     void testGetReadingForMonth() throws Exception {
-        ReadingInMonthRequestDto inMonthRequestDto  =Utils.getReadingInMonthRequest();
+    void testGetReadingForMonth() throws Exception {
+        ReadingInMonthRequestDto inMonthRequestDto = Utils.getReadingInMonthRequest();
         when(monitoringService.getReadingForMonth(any(ReadingInMonthRequestDto.class))).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/getbymonth")
