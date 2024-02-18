@@ -19,6 +19,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import repository.Utils;
 
@@ -33,39 +35,39 @@ class AuthControllerTest{
     @Mock
     private AuthService authService;
 
+    @InjectMocks
     private AuthController authController;
 
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        authController = new AuthController(authService);
+    public void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
     }
 
     @Test
-    void testAddUser() throws Exception {
-        User user = new User();
-        // Здесь у вас нужно создать тестового пользователя с данными
-
-      //  given(authService.userRegistration(any(User.class))).willReturn(new UserResponseDto("User registered"));
-
-        mockMvc.perform(post("/reg")
+    @DisplayName("Должен успешно аутентифицировать существующего пользователя")
+    void testAuthenticateUser() throws Exception {
+        UserRequestDto userRqDto = Utils.getUserRequestDto();
+        UserResponseDto dto = Utils.getUserResponseDto();
+        Mockito.when(authService.authenticateUser(userRqDto)).thenReturn(dto);
+        mockMvc.perform(post("/auth")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(user)))
-                .andExpect(status().isOk());
+                        .content(new ObjectMapper().writeValueAsString(userRqDto)))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("user"));
     }
 
     @Test
-    void testAuthenticateUser() throws Exception {
-        UserRequestDto userRequestDto = new UserRequestDto();
-        // Здесь у вас нужно создать объект ожидаемого запроса для аутентификации
-
-       // given(authService.authenticateUser(any(UserRequestDto.class))).willReturn(new UserResponseDto("User authenticated"));
-
-        mockMvc.perform(post("/auth")
+    @DisplayName(" Должен успешно зарегестрировать пользователя")
+    void testAddUser() throws Exception {
+        User user = Utils.getUser();
+        UserResponseDto dto = Utils.getUserResponseDto();
+        Mockito.when(authService.userRegistration(user)).thenReturn(dto);
+        mockMvc.perform(MockMvcRequestBuilders.post("/reg")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(userRequestDto)))
-                .andExpect(status().isOk());
+                        .content(new ObjectMapper().writeValueAsString(user)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("user"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userId").value("1"));
     }
 }
 

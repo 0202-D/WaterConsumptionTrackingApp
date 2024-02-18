@@ -13,33 +13,26 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <spring.webmvc.version>5.2.9.RELEASE</spring.webmvc.version>
         <jstl.version>1.2</jstl.version>
         <postgresql.version>42.6.0</postgresql.version>
         <c3p0.version>0.9.5.4</c3p0.version>
-        <spring.orm.version>5.3.0</spring.orm.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
-        <jackson.databind.version>2.11.3</jackson.databind.version>
+        <jackson.version>2.15.3</jackson.version>
         <liquibase.core.version>4.24.0</liquibase.core.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
-        <jackson.core.version>2.15.3</jackson.core.version>
         <validation.api.version>2.0.1.Final</validation.api.version>
-        <mockito.version>4.0.0</mockito.version>
+        <mockito.version>3.12.4</mockito.version>
         <HikariCP.version>5.0.1</HikariCP.version>
         <lombok.version>1.18.30</lombok.version>
         <jjwt.version>0.9.1</jjwt.version>
-        <junit.jupiter.version>5.8.1</junit.jupiter.version>
-        <spring.test.version>5.3.0</spring.test.version>
-        <spring.core.version>5.3.14</spring.core.version>
+        <junit.jupiter.version>5.9.3</junit.jupiter.version>
+        <spring.version>5.3.30</spring.version>
         <hibernate.validator.version>6.1.0.Final</hibernate.validator.version>
-        <log4j-api.version>2.20.0</log4j-api.version>
-        <spring.aop.version>5.3.25</spring.aop.version>
+        <log4j.version>2.17.1</log4j.version>
         <aspectjweaver.version>1.9.7</aspectjweaver.version>
         <aspectjrt.version>1.9.7</aspectjrt.version>
-        <junit.version>4.13.2</junit.version>
         <springfox.swagger2.version>3.0.0</springfox.swagger2.version>
         <springfox.swagger-ui.version>3.0.0</springfox.swagger-ui.version>
-        <log4j-core.version>2.21.1</log4j-core.version>
         <swagger-models.version>1.5.20</swagger-models.version>
         <json-path.version>2.6.0</json-path.version>
         <junit.testcontainers.version>1.17.6</junit.testcontainers.version>
@@ -49,7 +42,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>${spring.webmvc.version}</version>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -69,7 +62,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
-            <version>${spring.orm.version}</version>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -80,7 +73,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.databind.version}</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.liquibase</groupId>
@@ -95,7 +88,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>${jackson.core.version}</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
@@ -139,13 +132,13 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>${spring.test.version}</version>
+            <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
-            <version>${spring.core.version}</version>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -161,12 +154,12 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>${log4j-api.version}</version>
+            <version>${log4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
-            <version>${spring.aop.version}</version>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -178,12 +171,6 @@
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
             <version>${aspectjrt.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>

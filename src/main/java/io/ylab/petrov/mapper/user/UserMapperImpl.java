@@ -6,7 +6,7 @@ import io.ylab.petrov.model.user.User;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserMapperImpl implements UserMapper{
+public class UserMapperImpl implements UserMapper {
     @Override
     public UserResponseDto toDtoRs(User user) {
         return UserResponseDto.builder()
@@ -22,6 +22,5 @@ public class UserMapperImpl implements UserMapper{
                 .userName(userDto.getUserName())
                 .password(userDto.getPassword())
                 .build();
-
     }
 }

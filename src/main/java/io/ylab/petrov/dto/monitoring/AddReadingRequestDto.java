@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
  */
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-
+/**
+ * dto запроса на добавление показаний
+ */
 @Builder
 @Data
 @AllArgsConstructor
