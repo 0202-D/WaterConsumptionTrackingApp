@@ -9,6 +9,8 @@ import io.ylab.petrov.model.readout.Meter;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.model.user.User;
 import io.ylab.petrov.utils.HikariCPDataSource;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,10 +19,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+@Repository
+@RequiredArgsConstructor
 public class JdbcReadingRepository implements ReadingRepository {
-    private UserRepository userRepository = new JdbcUserRepository();
-    private MeterRepository meterRepository = new JdbcMeterRepository();
+    private final UserRepository userRepository;
+    private final MeterRepository meterRepository;
 
     @Override
     public void addReading(Reading reading) {
@@ -64,8 +67,6 @@ public class JdbcReadingRepository implements ReadingRepository {
 
     @Override
     public Optional<Reading> getReadingForMonth(ReadingInMonthRequestDto rq) {
-        userRepository = new JdbcUserRepository();
-        meterRepository = new JdbcMeterRepository();
         String query = "SELECT * FROM domain.reading WHERE user_id = ? AND meter_id = ? AND EXTRACT(MONTH FROM date) = ?";
         try (Connection connection = HikariCPDataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {

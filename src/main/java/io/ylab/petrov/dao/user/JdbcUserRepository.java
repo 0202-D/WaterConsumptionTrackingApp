@@ -3,10 +3,11 @@ package io.ylab.petrov.dao.user;
 import io.ylab.petrov.model.user.Role;
 import io.ylab.petrov.model.user.User;
 import io.ylab.petrov.utils.HikariCPDataSource;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.Optional;
-
+@Repository
 public class JdbcUserRepository implements UserRepository {
 
     private static final String GET_BY_NAME_QUERY = "SELECT u.* from domain.users u where u.user_name = ?";
@@ -48,7 +49,6 @@ public class JdbcUserRepository implements UserRepository {
                         user.setRole(Role.valueOf(resultSet.getString("role")));
                         return Optional.of(user);
                     } else {
-                        System.out.println("Пользователя с таким userName не существует");
                         return Optional.empty();
                     }
                 } catch (SQLException ex) {

@@ -1,10 +1,11 @@
 package io.ylab.petrov.mapper.user;
 
-
-import io.ylab.petrov.dto.user.UserResponseDto;
 import io.ylab.petrov.dto.user.UserRequestDto;
+import io.ylab.petrov.dto.user.UserResponseDto;
 import io.ylab.petrov.model.user.User;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserMapperImpl implements UserMapper {
     @Override
     public UserResponseDto toDtoRs(User user) {
@@ -15,13 +16,11 @@ public class UserMapperImpl implements UserMapper {
                 .build();
     }
 
-
     @Override
     public User toEntity(UserRequestDto userDto) {
         return User.builder()
                 .userName(userDto.getUserName())
                 .password(userDto.getPassword())
                 .build();
-
     }
 }

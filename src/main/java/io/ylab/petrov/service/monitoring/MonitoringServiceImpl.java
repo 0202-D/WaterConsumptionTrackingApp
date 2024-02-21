@@ -2,10 +2,7 @@ package io.ylab.petrov.service.monitoring;
 
 
 import io.ylab.petrov.aop.annotation.Loggable;
-import io.ylab.petrov.dao.audit.ActionRepository;
-import io.ylab.petrov.dao.audit.JdbcActionRepository;
 import io.ylab.petrov.dao.monitoring.*;
-import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
 import io.ylab.petrov.dto.monitoring.AddReadingRequestDto;
 import io.ylab.petrov.dto.monitoring.ReadingInMonthRequestDto;
@@ -14,17 +11,19 @@ import io.ylab.petrov.dto.monitoring.ReadingResponseDto;
 import io.ylab.petrov.model.readout.Meter;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.model.user.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-
+@Service
+@RequiredArgsConstructor
 public class MonitoringServiceImpl implements MonitoringService {
-    private final UserRepository userRepository = new JdbcUserRepository();
-    private final ReadingRepository readingRepository = new JdbcReadingRepository();
-    private final MeterRepository meterRepository = new JdbcMeterRepository();
-    private final ActionRepository actionRepository = new JdbcActionRepository();
+    private final UserRepository userRepository;
+    private final ReadingRepository readingRepository;
+    private final MeterRepository meterRepository;
 
     @Override
     @Loggable
@@ -50,11 +49,11 @@ public class MonitoringServiceImpl implements MonitoringService {
 
     @Override
     public boolean addReading(AddReadingRequestDto dto) {
-            User user = getUserById(dto.userId());
-            Meter meter = getMeterById(dto.meterId());
-            checkIfAlreadySubmittedForMonth(dto.userId(), dto.meterId());
-            updatePreviousReading(dto.userId(), dto.meterId());
-            saveNewReading(user, meter, dto.readout());
+            User user = getUserById(dto.getUserId());
+            Meter meter = getMeterById(dto.getMeterId());
+            checkIfAlreadySubmittedForMonth(dto.getUserId(), dto.getMeterId());
+            updatePreviousReading(dto.getUserId(), dto.getMeterId());
+            saveNewReading(user, meter, dto.getReadout());
             return true;
     }
 
