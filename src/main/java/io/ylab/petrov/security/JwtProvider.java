@@ -1,13 +1,13 @@
 package io.ylab.petrov.security;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.lang.Assert;
 import io.ylab.petrov.dto.user.UserResponseDto;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
-import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -45,8 +45,6 @@ public class JwtProvider {
             try {
                 Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
                 return true;
-            } catch (SignatureException e) {
-                logger.error("Invalid signature -> Message: {}", e);
             } catch (MalformedJwtException e) {
                 logger.error("Invalid JWT token -> Message: {}", e);
             } catch (UnsupportedJwtException e) {
