@@ -1,5 +1,6 @@
 package io.ylab.petrov.service.auth;
 
+import io.ylab.loggableaspectstarter.aop.annotation.Loggable;
 import io.ylab.petrov.dao.audit.ActionRepository;
 import io.ylab.petrov.dao.user.UserRepository;
 import io.ylab.petrov.dto.user.UserResponseDto;
@@ -44,10 +45,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Loggable
     public UserResponseDto authenticateUser(UserRequestDto user) {
         User dbUser = userRepository.getUserByUserName(user.getUserName())
-                .orElseThrow(()->new NotFoundException("Пользователя с таким именем не зарегестрировано"));
-        if (!dbUser.getPassword().equals(user.getPassword())){
+                .orElseThrow(() -> new NotFoundException("Пользователя с таким именем не зарегестрировано"));
+        if (!dbUser.getPassword().equals(user.getPassword())) {
             throw new IncorrectDataException("Не верный пароль!");
         }
         Action action = Action.builder()

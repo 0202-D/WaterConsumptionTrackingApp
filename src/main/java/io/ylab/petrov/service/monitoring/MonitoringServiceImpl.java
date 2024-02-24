@@ -1,7 +1,6 @@
 package io.ylab.petrov.service.monitoring;
 
 
-import io.ylab.petrov.aop.annotation.Loggable;
 import io.ylab.petrov.dao.monitoring.*;
 import io.ylab.petrov.dao.user.UserRepository;
 import io.ylab.petrov.dto.monitoring.AddReadingRequestDto;
@@ -26,7 +25,6 @@ public class MonitoringServiceImpl implements MonitoringService {
     private final MeterRepository meterRepository;
 
     @Override
-    @Loggable
     public Optional<ReadingResponseDto> getCurrentReading(ReadingRequestDto dto) {
         User user = userRepository.getUserById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
