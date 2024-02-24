@@ -27,10 +27,11 @@ public class AuthServiceImpl implements AuthService {
     private final UserMapper userMapper;
 
     @Override
-    public UserResponseDto userRegistration(User user) {
-        if (!checkExistUserByUserName(user.getUserName())) {
+    public UserResponseDto userRegistration(UserRequestDto dto) {
+        if (!checkExistUserByUserName(dto.getUserName())) {
             throw new IncorrectDataException("Имя уже занято");
         }
+        User user = userMapper.toEntity(dto);
         user.setRole(Role.USER);
         userRepository.addUser(user);
         User dbUser = userRepository.getUserByUserName(user.getUserName())
@@ -41,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
                 .dateTime(LocalDateTime.now())
                 .build();
         actionRepository.addAction(action);
-        return userMapper.toDtoRs(dbUser);
+        return userMapper.toUserResponseDto(dbUser);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
                 .userId(dbUser.getId())
                 .role(dbUser.getRole())
                 .build();
-        return userMapper.toDtoRs(dbUser);
+        return userMapper.toUserResponseDto(dbUser);
     }
 
     @Override

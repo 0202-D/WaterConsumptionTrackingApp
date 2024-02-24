@@ -47,10 +47,10 @@ class AuthControllerTest {
     @Test
     @DisplayName("Тест регистрации пользователя")
     void testAddUser() throws Exception {
-        User user = Utils.getUser();
+        UserRequestDto user = Utils.getUserRequestDto();
         UserResponseDto userResponse = Utils.getUserResponseDto();
         String givenDtoJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(user);
-        when(authService.userRegistration(any(User.class))).thenReturn(userResponse);
+        when(authService.userRegistration(any(UserRequestDto.class))).thenReturn(userResponse);
 
         mockMvc.perform(post("/reg")
                         .contentType(MediaType.APPLICATION_JSON).content(givenDtoJson))

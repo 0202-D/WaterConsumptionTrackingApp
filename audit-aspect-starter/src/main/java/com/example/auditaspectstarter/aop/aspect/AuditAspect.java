@@ -1,12 +1,8 @@
-package io.ylab.petrov.aop.aspect;
+package com.example.auditaspectstarter.aop.aspect;
 
-import io.ylab.petrov.dao.audit.ActionRepository;
-import io.ylab.petrov.dao.audit.JdbcActionRepository;
-import io.ylab.petrov.dto.monitoring.AddReadingRequestDto;
-import io.ylab.petrov.dto.monitoring.ReadingInMonthRequestDto;
-import io.ylab.petrov.dto.monitoring.ReadingRequestDto;
-import io.ylab.petrov.model.audit.Action;
-import io.ylab.petrov.model.audit.Activity;
+
+import com.example.auditaspectstarter.dao.ActionRepository;
+import com.example.auditaspectstarter.model.*;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
@@ -30,10 +26,7 @@ public class AuditAspect {
      */
     @After(value = "execution(* *..*ServiceImpl.getCurrentReading(..))&&args(dto)")
     public void addRequestedActivity(Object dto) {
-        ReadingRequestDto req = (ReadingRequestDto) dto;
-
         Action action = Action.builder()
-                .userId(req.getUserId())
                 .activity(Activity.REQUESTED)
                 .dateTime(LocalDateTime.now())
                 .build();
@@ -45,9 +38,7 @@ public class AuditAspect {
      */
     @After(value = "execution(* *..*ServiceImpl.getReadingForMonth(..))&&args(dto)")
     public void addRequestedForMonthActivity(Object dto) {
-        ReadingInMonthRequestDto req = (ReadingInMonthRequestDto) dto;
         Action action = Action.builder()
-                .userId(req.userId())
                 .activity(Activity.REQUESTED)
                 .dateTime(LocalDateTime.now())
                 .build();
@@ -71,9 +62,7 @@ public class AuditAspect {
      */
     @After(value = "execution(* *..*ServiceImpl.addReading(..))&&args(dto)")
     public void addActionActivity(Object dto) {
-        AddReadingRequestDto addReadingRequestDto = (AddReadingRequestDto) dto;
         Action action = Action.builder()
-                .userId(addReadingRequestDto.getUserId())
                 .activity(Activity.SUBMITTED)
                 .dateTime(LocalDateTime.now())
                 .build();

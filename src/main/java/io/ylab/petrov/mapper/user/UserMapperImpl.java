@@ -6,9 +6,9 @@ import io.ylab.petrov.model.user.User;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserMapperImpl implements UserMapper {
+public class UserMapperImpl implements UserMapper{
     @Override
-    public UserResponseDto toDtoRs(User user) {
+    public UserResponseDto toUserResponseDto(User user) {
         return UserResponseDto.builder()
                 .userId(user.getId())
                 .userName(user.getUserName())

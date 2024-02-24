@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static io.ylab.petrov.exception.ErrorCodes.*;
+import static io.ylab.petrov.exception.ErrorCode.*;
 
 /**
  Глобальный обработчик исключений для контроллеров.
@@ -24,14 +24,14 @@ import static io.ylab.petrov.exception.ErrorCodes.*;
 public class GlobalExceptionHandler {
 
 
-    private static final Map<Class<? extends RuntimeException>, ErrorCodes> errors = Map.of(
+    private static final Map<Class<? extends RuntimeException>, ErrorCode> errors = Map.of(
             NotFoundException.class, ERR_NOT_FOUND,
             IncorrectDataException.class, ERR_INCORRECT_DATA
     );
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        ErrorCodes errorCode = Optional.ofNullable(errors.get(e.getClass())).orElse(ERR_UNEXPECTED);
+        ErrorCode errorCode = Optional.ofNullable(errors.get(e.getClass())).orElse(ERR_UNEXPECTED);
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
                 .body(ErrorResponse.builder().code(errorCode).message(e.getMessage()).build());

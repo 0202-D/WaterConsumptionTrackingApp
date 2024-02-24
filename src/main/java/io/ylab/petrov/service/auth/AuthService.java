@@ -7,7 +7,7 @@ import io.ylab.petrov.model.user.User;
 import java.util.Optional;
 
 public interface AuthService {
-    UserResponseDto userRegistration(User user);
+    UserResponseDto userRegistration(UserRequestDto user);
 
     UserResponseDto authenticateUser(UserRequestDto user);
 

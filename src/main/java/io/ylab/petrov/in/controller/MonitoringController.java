@@ -21,10 +21,11 @@ import java.util.Optional;
 @Data
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/monitoring")
 public class MonitoringController {
     private final MonitoringService monitoringService;
     @Operation(summary = "Внесение показаний")
-    @PostMapping("/add")
+    @PostMapping()
     public ResponseEntity addReading(@RequestBody @Valid AddReadingRequestDto dto) {
         monitoringService.addReading(dto);
         return new ResponseEntity<>(HttpStatus.OK);

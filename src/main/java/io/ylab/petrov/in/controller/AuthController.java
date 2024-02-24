@@ -10,21 +10,23 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 @Tag(name = "Регистрация и аутентификация")
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/authentication")
 public class AuthController {
     private final AuthService authService;
     @Operation(summary = "Регистрация пользователя")
-    @PostMapping("/reg")
-    public UserResponseDto addUser(@RequestBody @Valid User user) {
-        return authService.userRegistration(user);
+    @PostMapping("/registration")
+    public UserResponseDto addUser(@RequestBody @Valid UserRequestDto dto) {
+        return authService.userRegistration(dto);
     }
 
-    @PostMapping("/auth")
+    @PostMapping("/login")
     @Operation(summary = "Аутентификация пользователя")
     public UserResponseDto authenticateUser(@RequestBody @Valid UserRequestDto dto) {
         return authService.authenticateUser(dto);
