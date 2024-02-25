@@ -9,5 +9,4 @@ import java.time.Month;
  */
 @Builder
 public record ReadingInMonthRequestDto(@NotNull long userId, @NotNull long meterId, @NotNull Month month) {
-
 }

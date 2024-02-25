@@ -1,4 +1,4 @@
-package com.example.auditaspectstarter.model;
+package io.ylab.auditaspectstarter.model;
 
 
 import lombok.AllArgsConstructor;

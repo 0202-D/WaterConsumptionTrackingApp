@@ -1,9 +1,8 @@
-package com.example.auditaspectstarter.config;
+package io.ylab.auditaspectstarter.config;
 
-import com.example.auditaspectstarter.aop.aspect.AuditAspect;
-import com.example.auditaspectstarter.dao.ActionRepository;
-import com.example.auditaspectstarter.dao.JdbcActionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.ylab.auditaspectstarter.aop.aspect.AuditAspect;
+import io.ylab.auditaspectstarter.dao.ActionRepository;
+import io.ylab.auditaspectstarter.dao.ActionRepositoryImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -13,7 +12,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 public class AuditAspectConfig {
     @Bean
     public ActionRepository actionRepository() {
-        return new JdbcActionRepository();
+        return new ActionRepositoryImpl();
     }
 
     @Bean

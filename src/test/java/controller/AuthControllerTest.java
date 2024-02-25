@@ -5,7 +5,6 @@ import io.ylab.petrov.WaterConsumptionTrackingAppApplication;
 import io.ylab.petrov.dto.user.UserRequestDto;
 import io.ylab.petrov.dto.user.UserResponseDto;
 import io.ylab.petrov.exception.IncorrectDataException;
-import io.ylab.petrov.model.user.User;
 import io.ylab.petrov.service.auth.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import repository.Utils;
+import utils.Utils;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -34,7 +33,6 @@ class AuthControllerTest {
     private WebApplicationContext webApplicationContext;
     @MockBean
     private AuthService authService;
-
     private ObjectMapper objectMapper;
     private MockMvc mockMvc;
 

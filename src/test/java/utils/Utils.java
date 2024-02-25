@@ -1,11 +1,14 @@
-package repository;
+package utils;
 
+import io.ylab.petrov.dto.monitoring.AddReadingRequestDto;
 import io.ylab.petrov.dto.monitoring.ReadingInMonthRequestDto;
+import io.ylab.petrov.dto.monitoring.ReadingRequestDto;
 import io.ylab.petrov.dto.monitoring.ReadingResponseDto;
 import io.ylab.petrov.dto.user.UserRequestDto;
 import io.ylab.petrov.dto.user.UserResponseDto;
 import io.ylab.petrov.model.audit.Action;
 import io.ylab.petrov.model.audit.Activity;
+import io.ylab.petrov.model.readout.Meter;
 import io.ylab.petrov.model.readout.Reading;
 import io.ylab.petrov.model.user.Role;
 import io.ylab.petrov.model.user.User;
@@ -78,13 +81,36 @@ public class Utils {
         return ReadingInMonthRequestDto.builder()
                 .userId(1L)
                 .meterId(1L)
-                .month(Month.APRIL)
+                .month(Month.FEBRUARY)
                 .build();
     }
-    public static ReadingResponseDto getReadingResponseDto(){
+
+    public static ReadingResponseDto getReadingResponseDto() {
         return ReadingResponseDto.builder()
                 .reading(new BigDecimal(100))
                 .date(LocalDate.now())
+                .build();
+    }
+
+    public static Meter getMeter() {
+        return Meter.builder()
+                .id(1L)
+                .name("HOT_WATER")
+                .build();
+    }
+
+    public static AddReadingRequestDto getAddReadingRequestDto() {
+        return AddReadingRequestDto.builder()
+                .meterId(1L)
+                .userId(1L)
+                .readout(new BigDecimal(100500))
+                .build();
+    }
+
+    public static ReadingRequestDto getReadingRequestDto() {
+        return ReadingRequestDto.builder()
+                .userId(1L)
+                .meterId(1L)
                 .build();
     }
 }

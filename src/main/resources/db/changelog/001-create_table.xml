@@ -4,8 +4,10 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
     <changeSet id="create-schema-domain" author="petrov" runOnChange="true">
         <sql>CREATE SCHEMA IF NOT EXISTS domain;</sql>
+        <sql>CREATE SEQUENCE domain.user_id_seq START WITH 3 INCREMENT BY 1;</sql>
+        <sql>CREATE SEQUENCE domain.reading_id_seq START WITH 1 INCREMENT BY 1;</sql>
         <createTable tableName="users" schemaName="domain" >
-            <column name="id" type="serial">
+            <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false" unique="true"/>
             </column>
             <column name="user_name" type="varchar(255)">
@@ -45,7 +47,7 @@
             </column>
         </createTable>
         <createTable tableName="reading" schemaName="domain">
-            <column name="id" type="serial">
+            <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="user_id" type="bigint">

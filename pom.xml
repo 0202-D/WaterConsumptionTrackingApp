@@ -21,6 +21,7 @@
         <jsonwebtoken.version>0.9.1</jsonwebtoken.version>
         <liquibase.version>4.24.0</liquibase.version>
         <springdoc.version>2.2.0</springdoc.version>
+        <hibernate.validator.version>8.0.1.Final</hibernate.validator.version>
     </properties>
     <dependencies>
         <dependency>
@@ -95,13 +96,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate.validator.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.ylab</groupId>
             <artifactId>loggable-aspect-starter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>cio.ylab</groupId>
+            <groupId>io.ylab</groupId>
             <artifactId>audit-aspect-starter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>

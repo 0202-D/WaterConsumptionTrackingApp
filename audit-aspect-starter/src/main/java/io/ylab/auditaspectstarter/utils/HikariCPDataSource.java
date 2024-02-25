@@ -1,4 +1,4 @@
-package com.example.auditaspectstarter.utils;
+package io.ylab.auditaspectstarter.utils;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

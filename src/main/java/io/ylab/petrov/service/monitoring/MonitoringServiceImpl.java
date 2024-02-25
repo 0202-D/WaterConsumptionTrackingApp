@@ -15,8 +15,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class MonitoringServiceImpl implements MonitoringService {
@@ -25,17 +27,26 @@ public class MonitoringServiceImpl implements MonitoringService {
     private final MeterRepository meterRepository;
 
     @Override
-    public Optional<ReadingResponseDto> getCurrentReading(ReadingRequestDto dto) {
+    public Optional<ReadingResponseDto> getCurrentReading(long userId, long meterId) {
+        ReadingRequestDto dto = ReadingRequestDto.builder()
+                .userId(userId)
+                .meterId(meterId)
+                .build();
         User user = userRepository.getUserById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
         return readingRepository.getCurrentReading(dto);
     }
 
     @Override
-    public Optional<Reading> getReadingForMonth(ReadingInMonthRequestDto rq) {
-        User user = userRepository.getUserById(rq.userId())
+    public Optional<Reading> getReadingForMonth(long userId, long meterId, Month month) {
+        ReadingInMonthRequestDto dto = ReadingInMonthRequestDto.builder()
+                .userId(userId)
+                .meterId(meterId)
+                .month(month)
+                .build();
+        User user = userRepository.getUserById(userId)
                 .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
-        return readingRepository.getReadingForMonth(rq);
+        return readingRepository.getReadingForMonth(dto);
     }
 
     @Override
@@ -47,12 +58,12 @@ public class MonitoringServiceImpl implements MonitoringService {
 
     @Override
     public boolean addReading(AddReadingRequestDto dto) {
-            User user = getUserById(dto.getUserId());
-            Meter meter = getMeterById(dto.getMeterId());
-            checkIfAlreadySubmittedForMonth(dto.getUserId(), dto.getMeterId());
-            updatePreviousReading(dto.getUserId(), dto.getMeterId());
-            saveNewReading(user, meter, dto.getReadout());
-            return true;
+        User user = getUserById(dto.getUserId());
+        Meter meter = getMeterById(dto.getMeterId());
+        checkIfAlreadySubmittedForMonth(dto.getUserId(), dto.getMeterId());
+        updatePreviousReading(dto.getUserId(), dto.getMeterId());
+        saveNewReading(user, meter, dto.getReadout());
+        return true;
     }
 
     private User getUserById(long userId) {

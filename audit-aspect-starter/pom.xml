@@ -8,7 +8,7 @@
         <version>3.2.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>cio.ylab</groupId>
+    <groupId>io.ylab</groupId>
     <artifactId>audit-aspect-starter</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>audit-aspect-starter</name>
