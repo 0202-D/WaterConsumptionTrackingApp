@@ -1,5 +1,6 @@
 package io.ylab.petrov.service.auth;
 
+import io.ylab.loggableaspectstarter.aop.annotation.Loggable;
 import io.ylab.petrov.dao.audit.ActionRepository;
 import io.ylab.petrov.dao.user.UserRepository;
 import io.ylab.petrov.dto.user.UserResponseDto;
@@ -26,10 +27,11 @@ public class AuthServiceImpl implements AuthService {
     private final UserMapper userMapper;
 
     @Override
-    public UserResponseDto userRegistration(User user) {
-        if (!checkExistUserByUserName(user.getUserName())) {
+    public UserResponseDto userRegistration(UserRequestDto dto) {
+        if (!checkExistUserByUserName(dto.getUserName())) {
             throw new IncorrectDataException("Имя уже занято");
         }
+        User user = userMapper.toEntity(dto);
         user.setRole(Role.USER);
         userRepository.addUser(user);
         User dbUser = userRepository.getUserByUserName(user.getUserName())
@@ -40,14 +42,15 @@ public class AuthServiceImpl implements AuthService {
                 .dateTime(LocalDateTime.now())
                 .build();
         actionRepository.addAction(action);
-        return userMapper.toDtoRs(dbUser);
+        return userMapper.toUserResponseDto(dbUser);
     }
 
     @Override
+    @Loggable
     public UserResponseDto authenticateUser(UserRequestDto user) {
         User dbUser = userRepository.getUserByUserName(user.getUserName())
-                .orElseThrow(()->new NotFoundException("Пользователя с таким именем не зарегестрировано"));
-        if (!dbUser.getPassword().equals(user.getPassword())){
+                .orElseThrow(() -> new NotFoundException("Пользователя с таким именем не зарегестрировано"));
+        if (!dbUser.getPassword().equals(user.getPassword())) {
             throw new IncorrectDataException("Не верный пароль!");
         }
         Action action = Action.builder()
@@ -60,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
                 .userId(dbUser.getId())
                 .role(dbUser.getRole())
                 .build();
-        return userMapper.toDtoRs(dbUser);
+        return userMapper.toUserResponseDto(dbUser);
     }
 
     @Override

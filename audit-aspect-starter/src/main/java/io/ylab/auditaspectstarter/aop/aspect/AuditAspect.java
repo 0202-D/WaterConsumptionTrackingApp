@@ -1,18 +1,17 @@
-package io.ylab.petrov.aop.aspect;
+package io.ylab.auditaspectstarter.aop.aspect;
 
-import io.ylab.petrov.dao.audit.ActionRepository;
-import io.ylab.petrov.dao.audit.JdbcActionRepository;
-import io.ylab.petrov.dto.monitoring.AddReadingRequestDto;
-import io.ylab.petrov.dto.monitoring.ReadingInMonthRequestDto;
-import io.ylab.petrov.dto.monitoring.ReadingRequestDto;
-import io.ylab.petrov.model.audit.Action;
-import io.ylab.petrov.model.audit.Activity;
+
+import io.ylab.auditaspectstarter.dao.ActionRepository;
+import io.ylab.auditaspectstarter.model.Action;
+import io.ylab.auditaspectstarter.model.Activity;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.Month;
+
 /**
  * Класс аспекта для аудита действий, связанных с мониторингом операций сервиса.
  * Этот аспект регистрирует запрошенные действия, такие как getCurrentReading, getReadingForMonth,
@@ -24,37 +23,43 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AuditAspect {
     private final ActionRepository actionRepository;
+
     /**
      * Регистрирует запрошенное действие для операции получения текущих показаний.
-     * @param dto Объект запроса, содержащий идентификатор пользователя.
+     *
+     * @param userId  идентификатор пользователя.
+     * @param meterId идентификатор счетчика.
      */
-    @After(value = "execution(* *..*ServiceImpl.getCurrentReading(..))&&args(dto)")
-    public void addRequestedActivity(Object dto) {
-        ReadingRequestDto req = (ReadingRequestDto) dto;
-
+    @After(value = "execution(* *..*ServiceImpl.getCurrentReading(long,long))&&args(userId,meterId)", argNames = "userId,meterId")
+    public void addRequestedActivity(long userId, long meterId) {
         Action action = Action.builder()
-                .userId(req.getUserId())
+                .userId(userId)
                 .activity(Activity.REQUESTED)
                 .dateTime(LocalDateTime.now())
                 .build();
         actionRepository.addAction(action);
     }
+
     /**
      * Регистрирует запрошенное действие для операции получения показания за месяц.
-     * @param dto Объект запроса, содержащий идентификатор пользователя.
+     *
+     * @param userId  идентификатор пользователя.
+     * @param meterId идентификатор счетчика.
+     * @param month   месяц за который внесены показания
      */
-    @After(value = "execution(* *..*ServiceImpl.getReadingForMonth(..))&&args(dto)")
-    public void addRequestedForMonthActivity(Object dto) {
-        ReadingInMonthRequestDto req = (ReadingInMonthRequestDto) dto;
+    @After(value = "execution(* *..*ServiceImpl.getReadingForMonth(..))&&args(userId,meterId,month)", argNames = "userId,meterId,month")
+    public void addRequestedForMonthActivity(long userId, long meterId, Month month) {
         Action action = Action.builder()
-                .userId(req.userId())
+                .userId(userId)
                 .activity(Activity.REQUESTED)
                 .dateTime(LocalDateTime.now())
                 .build();
         actionRepository.addAction(action);
     }
+
     /**
      * Регистрирует запрошенное действие для операции просмотра истории
+     *
      * @param userId Идентификатор пользователя, для которого извлекается история.
      */
     @After(value = "execution(* *..*ServiceImpl.historyReadingsByUserId(long)) && args(userId)")
@@ -65,15 +70,15 @@ public class AuditAspect {
                 .dateTime(LocalDateTime.now())
                 .build());
     }
+
     /**
      * Регистрирует запрошенное действие для операции добавления показаний.
+     *
      * @param dto Объект запроса, содержащий идентификатор пользователя.
      */
     @After(value = "execution(* *..*ServiceImpl.addReading(..))&&args(dto)")
     public void addActionActivity(Object dto) {
-        AddReadingRequestDto addReadingRequestDto = (AddReadingRequestDto) dto;
         Action action = Action.builder()
-                .userId(addReadingRequestDto.getUserId())
                 .activity(Activity.SUBMITTED)
                 .dateTime(LocalDateTime.now())
                 .build();

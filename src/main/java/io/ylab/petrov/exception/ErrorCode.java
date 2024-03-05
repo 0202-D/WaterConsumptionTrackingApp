@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 /**
  * возвращаемые коды ошибок на фронт
  */
-public enum ErrorCodes {
+public enum ErrorCode {
 
 
     ERR_UNEXPECTED(HttpStatus.INTERNAL_SERVER_ERROR),
@@ -18,7 +18,7 @@ public enum ErrorCodes {
 
     private final HttpStatus httpStatus;
 
-    ErrorCodes(HttpStatus httpStatus) {
+    ErrorCode(HttpStatus httpStatus) {
         this.httpStatus = httpStatus;
     }
 

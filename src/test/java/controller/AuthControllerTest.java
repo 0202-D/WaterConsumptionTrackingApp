@@ -1,68 +1,87 @@
 package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.ylab.petrov.WaterConsumptionTrackingAppApplication;
 import io.ylab.petrov.dto.user.UserRequestDto;
 import io.ylab.petrov.dto.user.UserResponseDto;
-import io.ylab.petrov.in.controller.AuthController;
-import io.ylab.petrov.model.user.User;
+import io.ylab.petrov.exception.IncorrectDataException;
 import io.ylab.petrov.service.auth.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import repository.Utils;
+import org.springframework.web.context.WebApplicationContext;
+import utils.Utils;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-@ExtendWith(MockitoExtension.class)
-class AuthControllerTest{
+
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = WaterConsumptionTrackingAppApplication.class)
+class AuthControllerTest {
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+    @MockBean
+    private AuthService authService;
+    private ObjectMapper objectMapper;
     private MockMvc mockMvc;
 
-    @Mock
-    private AuthService authService;
-
-    @InjectMocks
-    private AuthController authController;
-
     @BeforeEach
-    public void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
+    void init() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        objectMapper = new ObjectMapper();
     }
 
     @Test
-    @DisplayName("Должен успешно аутентифицировать существующего пользователя")
+    @DisplayName("Тест регистрации пользователя")
+    void testAddUser() throws Exception {
+        UserRequestDto user = Utils.getUserRequestDto();
+        UserResponseDto userResponse = Utils.getUserResponseDto();
+        String givenDtoJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(user);
+        when(authService.userRegistration(any(UserRequestDto.class))).thenReturn(userResponse);
+
+        mockMvc.perform(post("/reg")
+                        .contentType(MediaType.APPLICATION_JSON).content(givenDtoJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userName").value(userResponse.getUserName()));
+    }
+
+    @Test
+    @DisplayName("Тест аутентификации пользователя")
     void testAuthenticateUser() throws Exception {
-        UserRequestDto userRqDto = Utils.getUserRequestDto();
-        UserResponseDto dto = Utils.getUserResponseDto();
-        Mockito.when(authService.authenticateUser(userRqDto)).thenReturn(dto);
+        UserRequestDto userRequestDto = Utils.getUserRequestDto();
+        UserResponseDto userResponse = Utils.getUserResponseDto();
+        String givenDtoJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(userRequestDto);
+        when(authService.authenticateUser(any(UserRequestDto.class))).thenReturn(userResponse);
+
         mockMvc.perform(post("/auth")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(userRqDto)))
+                        .content(givenDtoJson))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("user"));
+                .andExpect(jsonPath("$.userName").value(userResponse.getUserName()));
     }
 
     @Test
-    @DisplayName(" Должен успешно зарегестрировать пользователя")
-    void testAddUser() throws Exception {
-        User user = Utils.getUser();
-        UserResponseDto dto = Utils.getUserResponseDto();
-        Mockito.when(authService.userRegistration(user)).thenReturn(dto);
-        mockMvc.perform(MockMvcRequestBuilders.post("/reg")
+    @DisplayName("Тест неудачной аутентификации пользователя")
+    void testAuthenticateUserNotSuccess() throws Exception {
+        UserRequestDto userRequestDto = Utils.getUserRequestDto();
+        String givenDtoJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(userRequestDto);
+        when(authService.authenticateUser(any(UserRequestDto.class))).thenThrow(new IncorrectDataException("Не корректные данные"));
+
+        mockMvc.perform(post("/auth")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(user)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("user"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userId").value("1"));
+                        .content(givenDtoJson))
+                .andExpect(status().isBadRequest());
     }
 }
 

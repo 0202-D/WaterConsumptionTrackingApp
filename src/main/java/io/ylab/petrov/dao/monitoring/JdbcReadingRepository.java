@@ -1,6 +1,5 @@
 package io.ylab.petrov.dao.monitoring;
 
-import io.ylab.petrov.dao.user.JdbcUserRepository;
 import io.ylab.petrov.dao.user.UserRepository;
 import io.ylab.petrov.dto.monitoring.ReadingInMonthRequestDto;
 import io.ylab.petrov.dto.monitoring.ReadingRequestDto;
@@ -27,7 +26,8 @@ public class JdbcReadingRepository implements ReadingRepository {
 
     @Override
     public void addReading(Reading reading) {
-        String query = "INSERT INTO domain.reading (user_id, meter_id, meter_reading, date, is_current) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO domain.reading (id,user_id, meter_id, meter_reading, date, is_current)" +
+                " VALUES (nextval('domain.reading_id_seq'),?, ?, ?, ?, ?)";
         try (Connection connection = HikariCPDataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, reading.getUser().getId());

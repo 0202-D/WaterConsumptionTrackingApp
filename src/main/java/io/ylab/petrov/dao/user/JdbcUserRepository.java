@@ -7,10 +7,12 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.Optional;
+
 @Repository
 public class JdbcUserRepository implements UserRepository {
 
     private static final String GET_BY_NAME_QUERY = "SELECT u.* from domain.users u where u.user_name = ?";
+
     // Метод для получения пользователя по идентификатору
     public Optional<User> getUserById(long userId) {
         try (Connection connection = HikariCPDataSource.getConnection();
@@ -42,22 +44,22 @@ public class JdbcUserRepository implements UserRepository {
                 connection.prepareStatement(GET_BY_NAME_QUERY)) {
             statement.setString(1, userName);
             ResultSet resultSet = statement.executeQuery();
-                    if (resultSet.next()) {
-                        user.setId(resultSet.getLong("id"));
-                        user.setUserName(resultSet.getString("user_name"));
-                        user.setPassword(resultSet.getString("password"));
-                        user.setRole(Role.valueOf(resultSet.getString("role")));
-                        return Optional.of(user);
-                    } else {
-                        return Optional.empty();
-                    }
-                } catch (SQLException ex) {
+            if (resultSet.next()) {
+                user.setId(resultSet.getLong("id"));
+                user.setUserName(resultSet.getString("user_name"));
+                user.setPassword(resultSet.getString("password"));
+                user.setRole(Role.valueOf(resultSet.getString("role")));
+                return Optional.of(user);
+            } else {
+                return Optional.empty();
+            }
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
 
     public void addUser(User user) {
-        String sql = "INSERT INTO domain.users (user_name, password, role) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO domain.users (id, user_name, password, role) VALUES (nextval('domain.user_id_seq'), ?, ?, ?)";
         try (Connection connection = HikariCPDataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUserName());
